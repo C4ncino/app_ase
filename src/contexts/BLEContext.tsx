@@ -14,7 +14,7 @@ type Props = {
 
 const BLEContextProvider = ({ children }: Props) => {
   const manager = new BleManager();
-  const [devide, setDevice] = useState<Device>();
+  const [device, setDevice] = useState<Device>();
 
   const requestAndroid31Permissions = async () => {
     const bluetoothScanPermission = await PermissionsAndroid.request(
@@ -82,6 +82,7 @@ const BLEContextProvider = ({ children }: Props) => {
 
       if (scannedDevice) {
         console.log(scannedDevice.name);
+        connect(scannedDevice.id);
       }
     });
   };
@@ -90,18 +91,19 @@ const BLEContextProvider = ({ children }: Props) => {
     try {
       const newDevice = await manager.connectToDevice(deviceId);
       setDevice(newDevice);
+      getServices();
     } catch (error) {
       console.log(error);
     }
   };
 
   const getServices = async () => {
-    if (!devide) return;
+    if (!device) return;
 
-    await devide.discoverAllServicesAndCharacteristics();
+    await device.discoverAllServicesAndCharacteristics();
 
     try {
-      const services = await devide.services();
+      const services = await device.services();
       console.log(services);
     } catch (error) {
       console.log(error);

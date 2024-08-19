@@ -1,4 +1,3 @@
-import { useAPI } from "@src/hooks/useAPI";
 import { useSessionContext } from "@src/hooks/useSessionContext";
 import { useEffect } from "react";
 import { View, Text } from "react-native";
@@ -11,31 +10,16 @@ const Home = () => {
 
   const { scan, requestPermissions } = useBleContext();
 
-  const { post } = useAPI();
-
-  const scanForDevices = async () => {
-    const isPermissionsEnabled = await requestPermissions();
-    if (isPermissionsEnabled) {
-      scan();
-    }
-  };
-
   useEffect(() => {
-    const get_data = async () => {
-      const response = await post(
-        "/users/login",
-        JSON.stringify({
-          username: "emilys",
-          password: "emilyspass",
-          expiresInMins: 30,
-        })
-      );
-      console.log("🚀 ~ useEffect ~ response:", response);
+    const scanForDevices = async () => {
+      const isPermissionsEnabled = await requestPermissions();
+      if (isPermissionsEnabled) {
+        scan();
+      }
     };
 
-    get_data();
     scanForDevices();
-  }, [post]);
+  }, [requestPermissions, scan]);
 
   console.log("Hola");
 
