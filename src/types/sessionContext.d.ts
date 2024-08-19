@@ -1,0 +1,3 @@
+interface SessionContextModel {
+  name: string;
+}
