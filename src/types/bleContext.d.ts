@@ -1,6 +1,5 @@
 interface BLEContextModel {
-  requestPermissions: () => Promise<boolean>;
-  scan: () => void;
+  scan: (setMessage: React.Dispatch<React.SetStateAction<string>>) => void;
   // connect: () => void;
   // disconnect: () => void;
   // write: () => void;
@@ -8,6 +7,7 @@ interface BLEContextModel {
 }
 
 interface BleDevice {
-  name?: string | null;
-  id?: string;
+  name: string;
+  id: string;
+  connectable: boolean;
 }

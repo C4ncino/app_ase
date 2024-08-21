@@ -1,9 +1,9 @@
 export const bleMessages = [
-  "Scanning for devices",
-  "No device found",
-  "Device found",
-  "Connecting to device",
-  "Error connecting to device",
-  "Device connected",
-  "Device disconnected",
+  "Buscando guante...",
+  "No se encontró dispositivo",
+  "¡Guante encontrado!",
+  "Conectando...",
+  "¡Error al conectar!",
+  "¡Todo listo!",
+  "Dispositivo desconectado",
 ];

@@ -1,10 +1,8 @@
 import { createContext, useState } from "react";
-import { PermissionsAndroid, Platform } from "react-native";
-import * as ExpoDevice from "expo-device";
 import { BleManager, Device } from "react-native-ble-plx";
+import { bleMessages } from "@src/messages/bleMessages";
 
 export const BLEContext = createContext<BLEContextModel>({
-  requestPermissions: () => Promise.resolve(false),
   scan: () => {},
 });
 
@@ -14,96 +12,78 @@ type Props = {
 
 const BLEContextProvider = ({ children }: Props) => {
   const manager = new BleManager();
+  const [deviceInfo, setDeviceInfo] = useState<BleDevice>();
   const [device, setDevice] = useState<Device>();
 
-  const requestAndroid31Permissions = async () => {
-    const bluetoothScanPermission = await PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN,
-      {
-        title: "Location Permission",
-        message: "Bluetooth Low Energy requires Location",
-        buttonPositive: "OK",
-      }
-    );
-    const bluetoothConnectPermission = await PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT,
-      {
-        title: "Location Permission",
-        message: "Bluetooth Low Energy requires Location",
-        buttonPositive: "OK",
-      }
-    );
-    const fineLocationPermission = await PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-      {
-        title: "Location Permission",
-        message: "Bluetooth Low Energy requires Location",
-        buttonPositive: "OK",
-      }
-    );
-
-    return (
-      bluetoothScanPermission === "granted" &&
-      bluetoothConnectPermission === "granted" &&
-      fineLocationPermission === "granted"
-    );
-  };
-
-  const requestPermissions = async () => {
-    if (Platform.OS === "android") {
-      if ((ExpoDevice.platformApiLevel ?? -1) < 31) {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-          {
-            title: "Location Permission",
-            message: "Bluetooth Low Energy requires Location",
-            buttonPositive: "OK",
-          }
-        );
-        return granted === PermissionsAndroid.RESULTS.GRANTED;
-      } else {
-        const isAndroid31PermissionsGranted =
-          await requestAndroid31Permissions();
-
-        return isAndroid31PermissionsGranted;
-      }
-    } else {
-      return true;
-    }
-  };
-
-  const scan = () => {
+  const scan = (setMessage: React.Dispatch<React.SetStateAction<string>>) => {
     setTimeout(() => {
       manager.stopDeviceScan();
+      if (!deviceInfo) {
+        setMessage(bleMessages[1]);
+        return;
+      }
+      setMessage(bleMessages[3]);
+      if (!deviceInfo.connectable) {
+        setMessage(bleMessages[4]);
+        return;
+      }
+
+      connect();
+      getServices();
     }, 2000);
+
+    setMessage(bleMessages[0]);
 
     manager.startDeviceScan(null, null, (error, scannedDevice) => {
       if (error) console.log(error.message);
 
-      if (scannedDevice) {
-        console.log(scannedDevice.name);
-        connect(scannedDevice.id);
+      if (scannedDevice?.id === "EA:26:25:0C:49:49") {
+        setMessage(bleMessages[2]);
+
+        if (
+          !scannedDevice?.isConnectable ||
+          !scannedDevice.name ||
+          !scannedDevice.id
+        )
+          return;
+
+        setDeviceInfo({
+          name: scannedDevice.name,
+          id: scannedDevice.id,
+          connectable: scannedDevice.isConnectable,
+        });
+
+        console.log(scannedDevice);
       }
     });
   };
 
-  const connect = async (deviceId: string) => {
+  const connect = async () => {
     try {
-      const newDevice = await manager.connectToDevice(deviceId);
+      if (!deviceInfo) return;
+      const newDevice = await manager.connectToDevice(deviceInfo.id);
       setDevice(newDevice);
-      getServices();
     } catch (error) {
       console.log(error);
     }
   };
 
   const getServices = async () => {
-    if (!device) return;
+    console.log("getServices");
 
-    await device.discoverAllServicesAndCharacteristics();
+    if (!device) {
+      console.log(device);
+      console.log("No device");
+      return;
+    }
+
+    const response = await device.discoverAllServicesAndCharacteristics();
+
+    console.log(response);
 
     try {
       const services = await device.services();
+      console.log("services");
       console.log(services);
     } catch (error) {
       console.log(error);
@@ -111,7 +91,6 @@ const BLEContextProvider = ({ children }: Props) => {
   };
 
   const bleContext: BLEContextModel = {
-    requestPermissions: requestPermissions,
     scan: scan,
   };
 
