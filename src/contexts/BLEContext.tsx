@@ -1,9 +1,13 @@
-import { createContext, useState } from "react";
-import { BleManager, Device } from "react-native-ble-plx";
+import { createContext, useEffect, useState } from "react";
+import { BleManager } from "react-native-ble-plx";
 import { bleMessages } from "@src/messages/bleMessages";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import useBase64 from "@src/hooks/useBase64";
 
 export const BLEContext = createContext<BLEContextModel>({
   scan: () => {},
+  connect: () => 0,
+  forget: () => {},
 });
 
 type Props = {
@@ -12,86 +16,146 @@ type Props = {
 
 const BLEContextProvider = ({ children }: Props) => {
   const manager = new BleManager();
-  const [deviceInfo, setDeviceInfo] = useState<BleDevice>();
-  const [device, setDevice] = useState<Device>();
 
-  const scan = (setMessage: React.Dispatch<React.SetStateAction<string>>) => {
-    setTimeout(() => {
-      manager.stopDeviceScan();
-      if (!deviceInfo) {
-        setMessage(bleMessages[1]);
-        return;
-      }
-      setMessage(bleMessages[3]);
-      if (!deviceInfo.connectable) {
-        setMessage(bleMessages[4]);
-        return;
-      }
+  const [data, setData] = useState<number[]>([]);
+  const [macAddress, setMacAddress] = useState("");
+  // const [batteryLevel, setBatteryLevel] = useState("");
 
-      connect();
-      getServices();
-    }, 2000);
+  const { decodeDecimal } = useBase64();
 
+  useEffect(() => {
+    const getData = async () => {
+      const mac = await AsyncStorage.getItem("mac");
+      if (mac) setMacAddress(mac);
+    };
+
+    getData();
+  }, []);
+
+  useEffect(() => {
+    if (data.length === 13) setData([]);
+  }, [data]);
+
+  const scan = (setMessage: StringSetter) => {
     setMessage(bleMessages[0]);
 
-    manager.startDeviceScan(null, null, (error, scannedDevice) => {
-      if (error) console.log(error.message);
+    if (macAddress) {
+      setMessage(bleMessages[2]);
+    }
 
-      if (scannedDevice?.id === "EA:26:25:0C:49:49") {
-        setMessage(bleMessages[2]);
+    manager.startDeviceScan(
+      null, // TODO: ADD UUIDs
+      { allowDuplicates: false },
+      async (error, scannedDevice) => {
+        if (error) console.log(error.message);
 
-        if (
-          !scannedDevice?.isConnectable ||
-          !scannedDevice.name ||
-          !scannedDevice.id
-        )
-          return;
+        if (scannedDevice?.name?.includes(process.env.EXPO_PUBLIC_BLE_PREFIX)) {
+          setMessage(bleMessages[2]);
 
-        setDeviceInfo({
-          name: scannedDevice.name,
-          id: scannedDevice.id,
-          connectable: scannedDevice.isConnectable,
-        });
+          if (!scannedDevice.id) return;
 
-        console.log(scannedDevice);
+          setMacAddress(scannedDevice.id);
+
+          console.log(
+            "🚀 ~ manager.startDeviceScan ~ scannedDevice:",
+            scannedDevice
+          );
+
+          await manager.stopDeviceScan();
+          await AsyncStorage.setItem("mac", scannedDevice.id);
+        }
       }
-    });
+    );
   };
 
   const connect = async () => {
     try {
-      if (!deviceInfo) return;
-      const newDevice = await manager.connectToDevice(deviceInfo.id);
-      setDevice(newDevice);
+      if (!macAddress) return 1;
+      manager
+        .connectToDevice(macAddress)
+        .then((device) => {
+          return device.discoverAllServicesAndCharacteristics();
+        })
+        .then((device) => {
+          return device.services();
+        })
+        .then((services) => {
+          const dataService = services.find(
+            (service) => service.uuid === process.env.EXPO_PUBLIC_DATA_UUID
+          );
+
+          if (dataService)
+            dataService.characteristics().then((characteristics) => {
+              if (!characteristics) return null;
+
+              const flexCharacteristic = characteristics.find(
+                (char) => char.uuid === process.env.EXPO_PUBLIC_FLEX_UUID
+              );
+              const imuCharacteristic = characteristics.find(
+                (char) => char.uuid === process.env.EXPO_PUBLIC_IMU_UUID
+              );
+
+              if (!flexCharacteristic || !imuCharacteristic) return null;
+
+              flexCharacteristic.monitor((error, char) => {
+                if (error) {
+                  console.log(
+                    "🚀 ~ flexCharacteristic.monitor ~ error:",
+                    error
+                  );
+                  return;
+                }
+                if (!char?.value) {
+                  console.error("No characteristic");
+                  return;
+                }
+                const rawStepData = decodeDecimal(char.value);
+                console.log("Received step data:", rawStepData);
+
+                setData((prevData) => [...prevData, rawStepData]);
+              });
+
+              imuCharacteristic.monitor((error, char) => {
+                if (error) {
+                  console.log("🚀 ~ imuCharacteristic.monitor ~ error:", error);
+                  return;
+                }
+                if (!char?.value) {
+                  console.error("No characteristic");
+                  return;
+                }
+
+                const rawImuData = decodeDecimal(char.value, true);
+                console.log("Received IMU data:", rawImuData);
+
+                setData((prevData) => [...prevData, rawImuData]);
+              });
+            });
+
+          const batService = services.find(
+            (service) => service.uuid === "06e5f447-85db-454e-b23d-fe9f582793d3"
+          );
+          if (batService)
+            batService.characteristics().then((characteristics) => {});
+        });
     } catch (error) {
-      console.log(error);
+      console.log("🚀 ~ connect ~ error:", error);
+      return 2;
     }
+
+    return 0;
   };
 
-  const getServices = async () => {
-    console.log("getServices");
-
-    if (!device) {
-      console.log(device);
-      console.log("No device");
-      return;
-    }
-
-    const response = await device.discoverAllServicesAndCharacteristics();
-
-    console.log(response);
-
-    try {
-      const services = await device.services();
-      console.log("services");
-      console.log(services);
-    } catch (error) {
-      console.log(error);
-    }
+  const forget = async () => {
+    // Disconnect
+    // Delete mac from storage
   };
 
   const bleContext: BLEContextModel = {
-    scan: scan,
+    macAddress,
+    scan,
+    connect,
+    forget,
   };
 
   return (

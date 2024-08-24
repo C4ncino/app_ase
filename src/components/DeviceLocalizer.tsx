@@ -1,17 +1,37 @@
 import { AntDesign } from "@expo/vector-icons";
 import { useBleContext } from "@src/hooks/useBLEContext";
+import { bleMessages } from "@src/messages/bleMessages";
 import { useState } from "react";
 import { View, Text, Modal, Button } from "react-native";
 
 const DeviceLocalizer = () => {
   const [open, setOpen] = useState(false);
+  const [found, setFound] = useState(false);
   const [message, setMessage] = useState("");
 
-  const { scan } = useBleContext();
+  const { scan, connect } = useBleContext();
 
   const onOpen = () => {
     setOpen(true);
+
+    setTimeout(async () => {
+      setFound(true);
+    }, 2000);
+
     scan(setMessage);
+  };
+
+  const connectToDevice = async () => {
+    const response = await connect();
+
+    if (response === 1) {
+      setMessage(bleMessages[1]);
+      return;
+    } else if (response === 2) {
+      setMessage(bleMessages[4]);
+      return;
+    }
+    setFound(false);
   };
 
   return (
@@ -32,6 +52,8 @@ const DeviceLocalizer = () => {
             <AntDesign name="loading1" size={50} color="black" />
           </View>
           {message && <Text>{message}</Text>}
+
+          {found && <Button title="Conectar" onPress={connectToDevice} />}
         </View>
       </Modal>
     </>
