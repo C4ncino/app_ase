@@ -1,5 +1,8 @@
 App Para guante:
-  ☐ Implement base 64 funtions
+  ✔ Implement base 64 funtions @done(24-08-26 17:51)
+
+  ☐ Separate connect to two service functions
+
   ☐ Create localizer component
     ☐ Structure
     ☐ Do localize flow
