@@ -5,23 +5,18 @@ const useBase64 = () => {
     return Buffer.from(value, "base64").toString();
   };
 
-  function hexToSignedInt(hex: string) {
-    let num = parseInt(hex, 16);
-    const bitLength = hex.length * 4; // each hex digit represents 4 bits
+  function hexToSignedInt(unsigned: number, bits = 16) {
+    const signBit = 1 << (bits - 1);
 
-    if (num >= 2 ** (bitLength - 1)) {
-      num -= 2 ** bitLength;
-    }
-
-    return num;
+    return unsigned >= signBit ? unsigned - (1 << bits) : unsigned;
   }
 
   const decodeDecimal = (value: string, signed = false) => {
-    const hex = Buffer.from(value, "base64").toString("hex");
+    const unsigned = parseInt(Buffer.from(value, "base64").toString("hex"), 16);
 
-    if (signed) return hexToSignedInt(hex);
+    if (signed) return hexToSignedInt(unsigned);
 
-    return parseInt(hex, 16);
+    return unsigned;
   };
 
   const encode = (value: string) => {

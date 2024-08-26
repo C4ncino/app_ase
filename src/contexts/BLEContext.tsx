@@ -5,6 +5,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import useBase64 from "@src/hooks/useBase64";
 
 export const BLEContext = createContext<BLEContextModel>({
+  isConnected: false,
   scan: () => {},
   connect: () => 0,
   forget: () => {},
@@ -19,6 +20,7 @@ const BLEContextProvider = ({ children }: Props) => {
 
   const [data, setData] = useState<number[]>([]);
   const [macAddress, setMacAddress] = useState("");
+  const [isConnected, setIsConnected] = useState(false);
   // const [batteryLevel, setBatteryLevel] = useState("");
 
   const { decodeDecimal } = useBase64();
@@ -106,7 +108,7 @@ const BLEContextProvider = ({ children }: Props) => {
                   return;
                 }
                 if (!char?.value) {
-                  console.error("No characteristic");
+                  console.log("No characteristic");
                   return;
                 }
                 const rawStepData = decodeDecimal(char.value);
@@ -121,7 +123,7 @@ const BLEContextProvider = ({ children }: Props) => {
                   return;
                 }
                 if (!char?.value) {
-                  console.error("No characteristic");
+                  console.log("No characteristic");
                   return;
                 }
 
@@ -135,8 +137,28 @@ const BLEContextProvider = ({ children }: Props) => {
           const batService = services.find(
             (service) => service.uuid === "06e5f447-85db-454e-b23d-fe9f582793d3"
           );
-          if (batService)
-            batService.characteristics().then((characteristics) => {});
+          // if (batService)
+          //   batService.characteristics().then((characteristics) => {
+          //     if (!characteristics) return null;
+
+          //     const batCharacteristic = characteristics.find(
+          //       (char) => char.uuid === "06e5f447-85db-454e-b23d-fe9f582793d3"
+          //     );
+          //     if (!batCharacteristic) return null;
+
+          //     batCharacteristic.monitor((error, char) => {
+          //       if (error) {
+          //         console.log("🚀 ~ batCharacteristic.monitor ~ error:", error);
+          //         return;
+          //       }
+          //       if (!char?.value) {
+          //         console.log("No characteristic");
+          //         return;
+          //       }
+
+          //       const rawBatData = decodeDecimal(char.value);
+          //       console.log("Received bat data:", rawBatData);
+          //   });
         });
     } catch (error) {
       console.log("🚀 ~ connect ~ error:", error);
@@ -152,7 +174,7 @@ const BLEContextProvider = ({ children }: Props) => {
   };
 
   const bleContext: BLEContextModel = {
-    macAddress,
+    isConnected,
     scan,
     connect,
     forget,

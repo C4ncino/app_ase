@@ -2,7 +2,7 @@ type StringSetter = React.Dispatch<React.SetStateAction<string>>;
 
 interface BLEContextModel {
   batteryLevel?: string;
-  macAddress?: string;
+  isConnected: boolean;
   scan: (setMessage: StringSetter) => void;
   connect: () => int;
   forget: () => void;
