@@ -1,4 +1,4 @@
-import ContextWrapper from "@src/contexts/ContextWrapper";
+import ContextWrapper from "@/contexts/ContextWrapper";
 import { Stack } from "expo-router";
 
 const Layout = () => {

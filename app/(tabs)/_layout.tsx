@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import DeviceLocalizer from "@src/components/DeviceLocalizer";
+import DeviceLocalizer from "@/components/DeviceLocalizer";
 import { Tabs } from "expo-router";
 
 const Layout = () => {

@@ -1,6 +1,6 @@
 import { AntDesign } from "@expo/vector-icons";
-import { useBleContext } from "@src/hooks/useBLEContext";
-import { bleMessages } from "@src/messages/bleMessages";
+import { useBleContext } from "@/hooks/useBLEContext";
+import { bleMessages } from "@/messages/bleMessages";
 import { useState } from "react";
 import { View, Text, Modal, Button } from "react-native";
 

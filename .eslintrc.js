@@ -13,7 +13,7 @@ module.exports = {
       typescript: {
         baseUrl: "./",
         paths: {
-          "@src/*": ["./src/*"],
+          "@/*": ["./src/*"],
         },
       },
     },

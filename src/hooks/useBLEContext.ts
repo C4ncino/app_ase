@@ -1,4 +1,4 @@
-import { BLEContext } from "@src/contexts/BLEContext";
+import { BLEContext } from "@/contexts/BLEContext";
 import { useContext } from "react";
 
 export const useBleContext = () => {
