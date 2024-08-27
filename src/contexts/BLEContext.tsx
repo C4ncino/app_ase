@@ -17,11 +17,16 @@ type Props = {
 };
 
 const BLEContextProvider = ({ children }: Props) => {
-  const {} = useEnv();
+  const {
+    blePrefix,
+    dataUUID,
+    flexUUID,
+    imuUUID,
+    batteryUUID,
+    percentageUUID,
+  } = useEnv();
 
   const manager = new BleManager();
-
-  const blePrefix = process.env.EXPO_PUBLIC_BLE_PREFIX || "Test";
 
   const [data, setData] = useState<number[]>([]);
   const [macAddress, setMacAddress] = useState("");
@@ -48,6 +53,7 @@ const BLEContextProvider = ({ children }: Props) => {
 
     if (macAddress) {
       setMessage(bleMessages[2]);
+      return;
     }
 
     manager.startDeviceScan(
@@ -88,60 +94,65 @@ const BLEContextProvider = ({ children }: Props) => {
         })
         .then((services) => {
           const dataService = services.find(
-            (service) => service.uuid === process.env.EXPO_PUBLIC_DATA_UUID
+            (service) => service.uuid === dataUUID
           );
 
-          if (dataService)
-            dataService.characteristics().then((characteristics) => {
-              if (!characteristics) return null;
+          if (!dataService) return null;
 
-              const flexCharacteristic = characteristics.find(
-                (char) => char.uuid === process.env.EXPO_PUBLIC_FLEX_UUID
-              );
-              const imuCharacteristic = characteristics.find(
-                (char) => char.uuid === process.env.EXPO_PUBLIC_IMU_UUID
-              );
+          dataService.characteristics().then((characteristics) => {
+            if (!characteristics) return null;
 
-              if (!flexCharacteristic || !imuCharacteristic) return null;
+            const flexCharacteristic = characteristics.find(
+              (char) => char.uuid === flexUUID
+            );
+            const imuCharacteristic = characteristics.find(
+              (char) => char.uuid === imuUUID
+            );
 
-              flexCharacteristic.monitor((error, char) => {
-                if (error) {
-                  console.log(
-                    "🚀 ~ flexCharacteristic.monitor ~ error:",
-                    error
-                  );
-                  return;
-                }
-                if (!char?.value) {
-                  console.log("No characteristic");
-                  return;
-                }
-                const rawStepData = decodeDecimal(char.value);
-                console.log("Received step data:", rawStepData);
+            if (!flexCharacteristic || !imuCharacteristic) return null;
 
-                setData((prevData) => [...prevData, rawStepData]);
-              });
+            flexCharacteristic.monitor((error, char) => {
+              if (error) {
+                console.log("🚀 ~ flexCharacteristic.monitor ~ error:", error);
+                return;
+              }
+              if (!char?.value) {
+                console.log("No characteristic");
+                return;
+              }
+              const rawStepData = decodeDecimal(char.value);
+              console.log("Received step data:", rawStepData);
 
-              imuCharacteristic.monitor((error, char) => {
-                if (error) {
-                  console.log("🚀 ~ imuCharacteristic.monitor ~ error:", error);
-                  return;
-                }
-                if (!char?.value) {
-                  console.log("No characteristic");
-                  return;
-                }
-
-                const rawImuData = decodeDecimal(char.value, true);
-                console.log("Received IMU data:", rawImuData);
-
-                setData((prevData) => [...prevData, rawImuData]);
-              });
+              setData((prevData) => [...prevData, rawStepData]);
             });
 
+            imuCharacteristic.monitor((error, char) => {
+              if (error) {
+                console.log("🚀 ~ imuCharacteristic.monitor ~ error:", error);
+                return;
+              }
+              if (!char?.value) {
+                console.log("No characteristic");
+                return;
+              }
+
+              const rawImuData = decodeDecimal(char.value, true);
+              console.log(
+                "🚀 ~ imuCharacteristic.monitor ~ char.value:",
+                char.value
+              );
+              console.log("Received IMU data:", rawImuData);
+
+              setData((prevData) => [...prevData, rawImuData]);
+            });
+          });
+
           const batService = services.find(
-            (service) => service.uuid === process.env.EXPO_PUBLIC_BAT_UUID
+            (service) => service.uuid === batteryUUID
           );
+          console.log("🚀 ~ .then ~ services:", services);
+
+          console.log("🚀 ~ .then ~ batService:", batService);
 
           if (!batService) return null;
 
@@ -149,9 +160,21 @@ const BLEContextProvider = ({ children }: Props) => {
             if (!characteristics) return null;
 
             const batLevelCharacteristic = characteristics.find(
-              (char) => char.uuid === process.env.EXPO_PUBLIC_PCT_UUID
+              (char) => char.uuid === percentageUUID
             );
+            console.log(
+              "🚀 ~ batService.characteristics ~ characteristics:",
+              characteristics
+            );
+
+            console.log(
+              "🚀 ~ batService.characteristics ~ batLevelCharacteristic:",
+              batLevelCharacteristic
+            );
+
             if (!batLevelCharacteristic) return null;
+
+            console.log("monitoring... percentage");
 
             batLevelCharacteristic.monitor((error, char) => {
               if (error) {
@@ -164,7 +187,10 @@ const BLEContextProvider = ({ children }: Props) => {
               }
 
               const rawBatData = decodeDecimal(char.value);
-              console.log("Received bat data:", rawBatData);
+              console.log(
+                "🚀 ~ batLevelCharacteristic.monitor ~ rawBatData:",
+                rawBatData
+              );
             });
           });
         });
