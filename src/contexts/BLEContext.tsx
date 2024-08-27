@@ -17,7 +17,11 @@ type Props = {
 };
 
 const BLEContextProvider = ({ children }: Props) => {
+  const {} = useEnv();
+
   const manager = new BleManager();
+
+  const blePrefix = process.env.EXPO_PUBLIC_BLE_PREFIX || "Test";
 
   const [data, setData] = useState<number[]>([]);
   const [macAddress, setMacAddress] = useState("");
@@ -52,7 +56,7 @@ const BLEContextProvider = ({ children }: Props) => {
       async (error, scannedDevice) => {
         if (error) console.log(error.message);
 
-        if (scannedDevice?.name?.includes(process.env.EXPO_PUBLIC_BLE_PREFIX)) {
+        if (scannedDevice?.name?.includes(blePrefix)) {
           setMessage(bleMessages[2]);
 
           if (!scannedDevice.id) return;
@@ -136,30 +140,33 @@ const BLEContextProvider = ({ children }: Props) => {
             });
 
           const batService = services.find(
-            (service) => service.uuid === "06e5f447-85db-454e-b23d-fe9f582793d3"
+            (service) => service.uuid === process.env.EXPO_PUBLIC_BAT_UUID
           );
-          // if (batService)
-          //   batService.characteristics().then((characteristics) => {
-          //     if (!characteristics) return null;
 
-          //     const batCharacteristic = characteristics.find(
-          //       (char) => char.uuid === "06e5f447-85db-454e-b23d-fe9f582793d3"
-          //     );
-          //     if (!batCharacteristic) return null;
+          if (!batService) return null;
 
-          //     batCharacteristic.monitor((error, char) => {
-          //       if (error) {
-          //         console.log("🚀 ~ batCharacteristic.monitor ~ error:", error);
-          //         return;
-          //       }
-          //       if (!char?.value) {
-          //         console.log("No characteristic");
-          //         return;
-          //       }
+          batService.characteristics().then((characteristics) => {
+            if (!characteristics) return null;
 
-          //       const rawBatData = decodeDecimal(char.value);
-          //       console.log("Received bat data:", rawBatData);
-          //   });
+            const batLevelCharacteristic = characteristics.find(
+              (char) => char.uuid === process.env.EXPO_PUBLIC_PCT_UUID
+            );
+            if (!batLevelCharacteristic) return null;
+
+            batLevelCharacteristic.monitor((error, char) => {
+              if (error) {
+                console.log("🚀 ~ batCharacteristic.monitor ~ error:", error);
+                return;
+              }
+              if (!char?.value) {
+                console.log("No characteristic");
+                return;
+              }
+
+              const rawBatData = decodeDecimal(char.value);
+              console.log("Received bat data:", rawBatData);
+            });
+          });
         });
     } catch (error) {
       console.log("🚀 ~ connect ~ error:", error);
