@@ -25,5 +25,5 @@ https://github.com/software-mansion/react-native-gesture-handler#readme
 | DATA | Service        | 5714d9ae-f818-4e30-a787-4df25114551a |
 | FLEX | Characteristic | 7f506c74-66e8-48f0-9a4a-a44248bccf35 |
 | IM   | Characteristic | 682d229d-4810-455d-abff-17cdf71f0b76 |
-| BAT  | Service        | 0x180F                               |
-| PCT  | Characteristic | 0x2A19                               |
+| BAT  | Service        | 0x180F (6159)                        |
+| PCT  | Characteristic | 0x2A19 (10777)                       |
