@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "TRApp",
-    "slug": "TRApp",
+    "name": "TR App",
+    "slug": "TR App",
     "version": "1.0.0",
     "scheme": "yourScheme",
     "orientation": "portrait",

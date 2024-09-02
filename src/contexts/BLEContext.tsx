@@ -1,13 +1,17 @@
-import { createContext, useEffect, useState } from "react";
 import { BleManager } from "react-native-ble-plx";
-import { bleMessages } from "@/messages/bleMessages";
+import { createContext, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import useBase64 from "@/hooks/useBase64";
+
 import useEnv from "@/hooks/useEnv";
+import useBase64 from "@/hooks/useBase64";
+import { bleMessages } from "@/messages/bleMessages";
 
 export const BLEContext = createContext<BLEContextModel>({
   isConnected: false,
+  data: [],
+  setData: () => {},
   scan: () => {},
+  stopScan: () => {},
   connect: () => 0,
   forget: () => {},
 });
@@ -17,23 +21,19 @@ type Props = {
 };
 
 const BLEContextProvider = ({ children }: Props) => {
-  const {
-    blePrefix,
-    dataUUID,
-    flexUUID,
-    imuUUID,
-    batteryUUID,
-    percentageUUID,
-  } = useEnv();
+  const { blePrefix, dataUUID, instanceUUID, batteryUUID, percentageUUID } =
+    useEnv();
 
   const manager = new BleManager();
 
-  const [data, setData] = useState<number[]>([]);
+  const [data, setData] = useState<string[][]>([]);
   const [macAddress, setMacAddress] = useState("");
   const [isConnected, setIsConnected] = useState(false);
-  // const [batteryLevel, setBatteryLevel] = useState("");
+  const [batteryLevel, setBatteryLevel] = useState(0);
 
-  const { decodeDecimal } = useBase64();
+  let tempData: string[] = [];
+
+  const { decodeUInt, decode } = useBase64();
 
   useEffect(() => {
     const getData = async () => {
@@ -57,7 +57,7 @@ const BLEContextProvider = ({ children }: Props) => {
     }
 
     manager.startDeviceScan(
-      null, // TODO: ADD UUIDs
+      null, //[dataUUID, batteryUUID],
       { allowDuplicates: false },
       async (error, scannedDevice) => {
         if (error) console.log(error.message);
@@ -69,11 +69,6 @@ const BLEContextProvider = ({ children }: Props) => {
 
           setMacAddress(scannedDevice.id);
 
-          console.log(
-            "🚀 ~ manager.startDeviceScan ~ scannedDevice:",
-            scannedDevice
-          );
-
           await manager.stopDeviceScan();
           await AsyncStorage.setItem("mac", scannedDevice.id);
         }
@@ -84,14 +79,11 @@ const BLEContextProvider = ({ children }: Props) => {
   const connect = async () => {
     try {
       if (!macAddress) return 1;
+
       manager
         .connectToDevice(macAddress)
-        .then((device) => {
-          return device.discoverAllServicesAndCharacteristics();
-        })
-        .then((device) => {
-          return device.services();
-        })
+        .then((device) => device.discoverAllServicesAndCharacteristics())
+        .then((device) => device.services())
         .then((services) => {
           const dataService = services.find(
             (service) => service.uuid === dataUUID
@@ -102,57 +94,30 @@ const BLEContextProvider = ({ children }: Props) => {
           dataService.characteristics().then((characteristics) => {
             if (!characteristics) return null;
 
-            const flexCharacteristic = characteristics.find(
-              (char) => char.uuid === flexUUID
-            );
-            const imuCharacteristic = characteristics.find(
-              (char) => char.uuid === imuUUID
+            const instanceCharacteristic = characteristics.find(
+              (char) => char.uuid === instanceUUID
             );
 
-            if (!flexCharacteristic || !imuCharacteristic) return null;
+            if (!instanceCharacteristic) return null;
 
-            flexCharacteristic.monitor((error, char) => {
-              if (error) {
-                console.log("🚀 ~ flexCharacteristic.monitor ~ error:", error);
-                return;
-              }
-              if (!char?.value) {
-                console.log("No characteristic");
-                return;
-              }
-              const rawStepData = decodeDecimal(char.value);
-              console.log("Received step data:", rawStepData);
-
-              setData((prevData) => [...prevData, rawStepData]);
-            });
-
-            imuCharacteristic.monitor((error, char) => {
-              if (error) {
-                console.log("🚀 ~ imuCharacteristic.monitor ~ error:", error);
-                return;
-              }
-              if (!char?.value) {
-                console.log("No characteristic");
+            instanceCharacteristic.monitor((error, char) => {
+              if (error || !char?.value) {
+                setIsConnected(false);
                 return;
               }
 
-              const rawImuData = decodeDecimal(char.value, true);
-              console.log(
-                "🚀 ~ imuCharacteristic.monitor ~ char.value:",
-                char.value
-              );
-              console.log("Received IMU data:", rawImuData);
+              tempData.push(char.value);
 
-              setData((prevData) => [...prevData, rawImuData]);
+              if (tempData.length === 8) {
+                setData((data) => [...data, tempData]);
+                tempData = [];
+              }
             });
           });
 
           const batService = services.find(
             (service) => service.uuid === batteryUUID
           );
-          console.log("🚀 ~ .then ~ services:", services);
-
-          console.log("🚀 ~ .then ~ batService:", batService);
 
           if (!batService) return null;
 
@@ -162,35 +127,16 @@ const BLEContextProvider = ({ children }: Props) => {
             const batLevelCharacteristic = characteristics.find(
               (char) => char.uuid === percentageUUID
             );
-            console.log(
-              "🚀 ~ batService.characteristics ~ characteristics:",
-              characteristics
-            );
-
-            console.log(
-              "🚀 ~ batService.characteristics ~ batLevelCharacteristic:",
-              batLevelCharacteristic
-            );
 
             if (!batLevelCharacteristic) return null;
 
-            console.log("monitoring... percentage");
-
             batLevelCharacteristic.monitor((error, char) => {
-              if (error) {
-                console.log("🚀 ~ batCharacteristic.monitor ~ error:", error);
-                return;
-              }
-              if (!char?.value) {
-                console.log("No characteristic");
+              if (error || !char?.value) {
+                setIsConnected(false);
                 return;
               }
 
-              const rawBatData = decodeDecimal(char.value);
-              console.log(
-                "🚀 ~ batLevelCharacteristic.monitor ~ rawBatData:",
-                rawBatData
-              );
+              setBatteryLevel(decodeUInt(char.value));
             });
           });
         });
@@ -202,14 +148,29 @@ const BLEContextProvider = ({ children }: Props) => {
     return 0;
   };
 
-  const forget = async () => {
-    // Disconnect
-    // Delete mac from storage
+  const resetContextData = async () => {
+    setMacAddress("");
+    setIsConnected(false);
+    setData([]);
+    await AsyncStorage.removeItem("mac");
+  };
+
+  const forget = () => {
+    console.log(data);
+
+    // resetContextData();
+    // if (isConnected) {
+    //   manager.cancelDeviceConnection(macAddress);
+    // }
   };
 
   const bleContext: BLEContextModel = {
     isConnected,
+    batteryLevel,
+    data,
+    setData,
     scan,
+    stopScan: () => manager.stopDeviceScan(),
     connect,
     forget,
   };

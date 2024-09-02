@@ -9,7 +9,7 @@ const DeviceLocalizer = () => {
   const [found, setFound] = useState(false);
   const [message, setMessage] = useState("");
 
-  const { scan, connect } = useBleContext();
+  const { scan, stopScan, connect, forget } = useBleContext();
 
   const onOpen = () => {
     setOpen(true);
@@ -43,10 +43,16 @@ const DeviceLocalizer = () => {
       <Modal visible={open}>
         <View className="flex-row justify-between mx-4 mt-3">
           <Text className="text-lg font-bold">Buscar Guante</Text>
-          <Button onPress={() => setOpen(false)} title="Cerrar" />
+          <Button
+            onPress={() => {
+              setOpen(false);
+              stopScan();
+            }}
+            title="Cerrar"
+          />
         </View>
 
-        <View className="mx-4 justify-center items-center">
+        <View className="mx-4 justify-center items-center my-2">
           {/* TODO: Animate loading */}
           <View>
             <AntDesign name="loading1" size={50} color="black" />
@@ -55,6 +61,7 @@ const DeviceLocalizer = () => {
 
           {found && <Button title="Conectar" onPress={connectToDevice} />}
         </View>
+        <Button title="Olvidar" onPress={forget} />
       </Modal>
     </>
   );

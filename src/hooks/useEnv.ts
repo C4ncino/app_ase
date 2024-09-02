@@ -3,8 +3,7 @@ const useEnv = () => {
     apiURL: process.env.EXPO_PUBLIC_API_URL,
     blePrefix: process.env.EXPO_PUBLIC_BLE_PREFIX,
     dataUUID: process.env.EXPO_PUBLIC_DATA_UUID,
-    flexUUID: process.env.EXPO_PUBLIC_FLEX_UUID,
-    imuUUID: process.env.EXPO_PUBLIC_IMU_UUID,
+    instanceUUID: process.env.EXPO_PUBLIC_INSTANCE_UUID,
     batteryUUID: process.env.EXPO_PUBLIC_BAT_UUID,
     percentageUUID: process.env.EXPO_PUBLIC_PCT_UUID,
   };
