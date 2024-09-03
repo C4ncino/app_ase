@@ -14,6 +14,8 @@ export const BLEContext = createContext<BLEContextModel>({
   stopScan: () => {},
   connect: () => 0,
   forget: () => {},
+  startDataSend: () => {},
+  stopDataSend: () => {},
 });
 
 type Props = {
@@ -21,19 +23,17 @@ type Props = {
 };
 
 const BLEContextProvider = ({ children }: Props) => {
-  const { blePrefix, dataUUID, instanceUUID, batteryUUID, percentageUUID } =
-    useEnv();
+  let tempData: string[] = [];
+  const [data, setData] = useState<string[][]>([]);
 
   const manager = new BleManager();
-
-  const [data, setData] = useState<string[][]>([]);
   const [macAddress, setMacAddress] = useState("");
-  const [isConnected, setIsConnected] = useState(false);
   const [batteryLevel, setBatteryLevel] = useState(0);
-
-  let tempData: string[] = [];
+  const [isConnected, setIsConnected] = useState(false);
 
   const { decodeUInt, decode } = useBase64();
+  const { blePrefix, dataUUID, instanceUUID, batteryUUID, percentageUUID } =
+    useEnv();
 
   useEffect(() => {
     const getData = async () => {
@@ -44,10 +44,6 @@ const BLEContextProvider = ({ children }: Props) => {
     getData();
   }, []);
 
-  useEffect(() => {
-    if (data.length === 13) setData([]);
-  }, [data]);
-
   const scan = (setMessage: StringSetter) => {
     setMessage(bleMessages[0]);
 
@@ -57,10 +53,10 @@ const BLEContextProvider = ({ children }: Props) => {
     }
 
     manager.startDeviceScan(
-      null, //[dataUUID, batteryUUID],
+      [dataUUID, batteryUUID],
       { allowDuplicates: false },
       async (error, scannedDevice) => {
-        if (error) console.log(error.message);
+        if (error) return;
 
         if (scannedDevice?.name?.includes(blePrefix)) {
           setMessage(bleMessages[2]);
@@ -76,9 +72,14 @@ const BLEContextProvider = ({ children }: Props) => {
     );
   };
 
-  const connect = async () => {
+  const connect = async (setMessage: StringSetter) => {
     try {
-      if (!macAddress) return 1;
+      if (!macAddress) {
+        setMessage(bleMessages[1]);
+        return;
+      }
+
+      setMessage(bleMessages[3]);
 
       manager
         .connectToDevice(macAddress)
@@ -89,16 +90,17 @@ const BLEContextProvider = ({ children }: Props) => {
             (service) => service.uuid === dataUUID
           );
 
-          if (!dataService) return null;
+          if (!dataService) throw "No hay servicio de información";
 
           dataService.characteristics().then((characteristics) => {
-            if (!characteristics) return null;
+            if (!characteristics) throw "Error Recuperando las características";
 
             const instanceCharacteristic = characteristics.find(
               (char) => char.uuid === instanceUUID
             );
 
-            if (!instanceCharacteristic) return null;
+            if (!instanceCharacteristic)
+              throw "No hay característica de información";
 
             instanceCharacteristic.monitor((error, char) => {
               if (error || !char?.value) {
@@ -106,9 +108,13 @@ const BLEContextProvider = ({ children }: Props) => {
                 return;
               }
 
-              tempData.push(char.value);
+              const value = decode(char.value);
 
-              if (tempData.length === 8) {
+              if (value !== " ") tempData.push(char.value);
+
+              if (tempData.length === 200) {
+                console.log("hola");
+
                 setData((data) => [...data, tempData]);
                 tempData = [];
               }
@@ -119,16 +125,17 @@ const BLEContextProvider = ({ children }: Props) => {
             (service) => service.uuid === batteryUUID
           );
 
-          if (!batService) return null;
+          if (!batService) throw "No hay servicio de batería";
 
           batService.characteristics().then((characteristics) => {
-            if (!characteristics) return null;
+            if (!characteristics) throw "No hay características de batería";
 
             const batLevelCharacteristic = characteristics.find(
               (char) => char.uuid === percentageUUID
             );
 
-            if (!batLevelCharacteristic) return null;
+            if (!batLevelCharacteristic)
+              throw "No hay característica de nivel de batería";
 
             batLevelCharacteristic.monitor((error, char) => {
               if (error || !char?.value) {
@@ -139,30 +146,32 @@ const BLEContextProvider = ({ children }: Props) => {
               setBatteryLevel(decodeUInt(char.value));
             });
           });
+
+          setMessage(bleMessages[5]);
         });
     } catch (error) {
-      console.log("🚀 ~ connect ~ error:", error);
-      return 2;
+      setMessage(bleMessages[4] + " :" + error);
     }
-
-    return 0;
   };
 
-  const resetContextData = async () => {
-    setMacAddress("");
-    setIsConnected(false);
-    setData([]);
-    await AsyncStorage.removeItem("mac");
-  };
+  const forget = async (setMessage: StringSetter) => {
+    console.log(data.map((d) => d.map((dd) => decode(dd))));
 
-  const forget = () => {
-    console.log(data);
+    // setMacAddress("");
+    // setIsConnected(false);
+    // setData([]);
+    // await AsyncStorage.removeItem("mac");
 
-    // resetContextData();
     // if (isConnected) {
     //   manager.cancelDeviceConnection(macAddress);
     // }
+
+    setMessage(bleMessages[6]);
   };
+
+  // TODO: write in char of BLE to stop sending routine
+  const startDataSend = () => {};
+  const stopDataSend = () => {};
 
   const bleContext: BLEContextModel = {
     isConnected,
@@ -173,6 +182,8 @@ const BLEContextProvider = ({ children }: Props) => {
     stopScan: () => manager.stopDeviceScan(),
     connect,
     forget,
+    startDataSend,
+    stopDataSend,
   };
 
   return (

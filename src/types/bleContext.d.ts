@@ -7,9 +7,8 @@ interface BLEContextModel {
   setData: React.Dispatch<React.SetStateAction<string[][]>>;
   scan: (setMessage: StringSetter) => void;
   stopScan: () => void;
-  connect: () => int;
-  forget: () => void;
-  // disconnect: () => void;
-  // write: () => void;
-  // read: () => void;
+  connect: (setMessage: StringSetter) => void;
+  forget: (setMessage: StringSetter) => void;
+  startDataSend: () => void;
+  stopDataSend: () => void;
 }
