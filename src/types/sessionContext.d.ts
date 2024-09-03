@@ -10,7 +10,7 @@ interface User {
 interface SessionContextModel {
   user?: User;
   token?: Token;
-  login: () => void;
-  signUp: () => void;
+  login: () => Promise<string>;
+  signUp: () => Promise<string>;
   logout: () => void;
 }

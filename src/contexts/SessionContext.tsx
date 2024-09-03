@@ -1,8 +1,12 @@
-import React, { useEffect, useState } from "react";
+import { router } from "expo-router";
+import React, { useCallback, useEffect, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+import useAPI from "@/hooks/useAPI";
 
 export const SessionContext = React.createContext<SessionContextModel>({
-  login: () => {},
-  signUp: () => {},
+  login: () => new Promise((resolve) => resolve("")),
+  signUp: () => new Promise((resolve) => resolve("")),
   logout: () => {},
 });
 
@@ -12,43 +16,65 @@ type Props = {
 
 const SessionContextProvider = ({ children }: Props) => {
   const [user, setUser] = useState<User>();
-  const [token, setToken] = useState("");
+  const [token, setToken] = useState<Token>();
+  const { get, post } = useAPI();
 
-  const getToken = () => {
-    // get token from async storage
-  };
+  const getToken = useCallback(async () => {
+    const token = await AsyncStorage.getItem("token");
+
+    // if (!token) router.replace("/login");
+
+    const response = await get("users/me", token ? token : "");
+
+    // if (!response) router.replace("/login");
+
+    setUser(response.data);
+  }, [get]);
 
   useEffect(() => {
-    // get token from async storage
-    // Validate token
-    // Get user from token
-    //! set page to login
-  }, []);
+    getToken();
+  }, [getToken]);
 
-  const setSessionData = () => {
-    // setUser(response.data)
-    // setToken
-    // save token to async storage
+  const setSessionData = async (user: User, token: Token) => {
+    setUser(user);
+
+    setToken(token);
+
+    await AsyncStorage.setItem("token", token);
   };
 
-  const login = () => {
+  const login = async () => {
     // make post request
-    // Handle response
-    // Set Session data
-    //! return error message
+    const response = await post("users/login", JSON.stringify({}));
+
+    if (response) {
+      setSessionData(response.data.user, response.data.token);
+      router.navigate("/");
+      return "Todo Listo";
+    }
+    return "Algo salio mal...";
   };
 
-  const signUp = () => {
+  const signUp = async () => {
     // make post request
-    // Handle response
-    // Set Session data
-    //! return error message
+    const response = await post("users/login", JSON.stringify({}));
+
+    if (response) {
+      setSessionData(response.data.user, response.data.token);
+      router.navigate("/");
+      return "Todo Listo";
+    }
+
+    return "Algo salio mal...";
   };
 
-  const logout = () => {
-    // set user to undefined
-    // set token to undefined
-    // set page to login
+  const logout = async () => {
+    setUser(undefined);
+
+    setToken(undefined);
+    await AsyncStorage.removeItem("token");
+
+    router.push("/login");
   };
 
   const sessionContext: SessionContextModel = {
