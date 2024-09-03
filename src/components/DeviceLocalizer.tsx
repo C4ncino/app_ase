@@ -1,4 +1,5 @@
 import { useBleContext } from "@/hooks/useBLEContext";
+import { bleMessages } from "@/messages/bleMessages";
 import { useState } from "react";
 import { View, Text, Modal, Button, ActivityIndicator } from "react-native";
 
@@ -36,7 +37,11 @@ const DeviceLocalizer = () => {
           <ActivityIndicator size={64} color="#00f" />
           {message && <Text>{message}</Text>}
           {message && (
-            <Button title="Conectar" onPress={() => connect(setMessage)} />
+            <Button
+              title="Conectar"
+              onPress={() => connect(setMessage)}
+              disabled={message === bleMessages[0]}
+            />
           )}
         </View>
         <Button title="Olvidar" onPress={() => forget(setMessage)} />

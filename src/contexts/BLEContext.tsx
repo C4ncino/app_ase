@@ -1,5 +1,5 @@
 import { BleManager } from "react-native-ble-plx";
-import { createContext, useEffect, useState } from "react";
+import { createContext, useEffect, useMemo, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import useEnv from "@/hooks/useEnv";
@@ -10,12 +10,12 @@ export const BLEContext = createContext<BLEContextModel>({
   isConnected: false,
   data: [],
   setData: () => {},
+  receiving: false,
+  setReceiving: () => {},
   scan: () => {},
   stopScan: () => {},
   connect: () => 0,
   forget: () => {},
-  startDataSend: () => {},
-  stopDataSend: () => {},
 });
 
 type Props = {
@@ -23,17 +23,25 @@ type Props = {
 };
 
 const BLEContextProvider = ({ children }: Props) => {
+  const manager = useMemo(() => new BleManager(), []);
+
   let tempData: string[] = [];
   const [data, setData] = useState<string[][]>([]);
 
-  const manager = new BleManager();
   const [macAddress, setMacAddress] = useState("");
   const [batteryLevel, setBatteryLevel] = useState(0);
+  const [receiving, setReceiving] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
 
-  const { decodeUInt, decode } = useBase64();
-  const { blePrefix, dataUUID, instanceUUID, batteryUUID, percentageUUID } =
-    useEnv();
+  const { decodeUInt, decode, encodeBool } = useBase64();
+  const {
+    blePrefix,
+    dataUUID,
+    activeUUID,
+    instanceUUID,
+    batteryUUID,
+    percentageUUID,
+  } = useEnv();
 
   useEffect(() => {
     const getData = async () => {
@@ -43,6 +51,27 @@ const BLEContextProvider = ({ children }: Props) => {
 
     getData();
   }, []);
+
+  useEffect(() => {
+    const updateReceiving = async () => {
+      await manager.writeCharacteristicWithResponseForDevice(
+        macAddress,
+        dataUUID,
+        activeUUID,
+        encodeBool(receiving)
+      );
+    };
+
+    if (isConnected) updateReceiving();
+  }, [
+    receiving,
+    macAddress,
+    dataUUID,
+    activeUUID,
+    encodeBool,
+    manager,
+    isConnected,
+  ]);
 
   const scan = (setMessage: StringSetter) => {
     setMessage(bleMessages[0]);
@@ -108,9 +137,7 @@ const BLEContextProvider = ({ children }: Props) => {
                 return;
               }
 
-              const value = decode(char.value);
-
-              if (value !== " ") tempData.push(char.value);
+              tempData.push(char.value);
 
               if (tempData.length === 200) {
                 console.log("hola");
@@ -169,21 +196,17 @@ const BLEContextProvider = ({ children }: Props) => {
     setMessage(bleMessages[6]);
   };
 
-  // TODO: write in char of BLE to stop sending routine
-  const startDataSend = () => {};
-  const stopDataSend = () => {};
-
   const bleContext: BLEContextModel = {
     isConnected,
     batteryLevel,
     data,
     setData,
+    receiving,
+    setReceiving,
     scan,
     stopScan: () => manager.stopDeviceScan(),
     connect,
     forget,
-    startDataSend,
-    stopDataSend,
   };
 
   return (

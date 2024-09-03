@@ -6,12 +6,18 @@ const useBase64 = () => {
   const decodeUInt = (value: string) =>
     Buffer.from(value, "base64").readUint8(0);
 
-  const encode = (value: string) => Buffer.from(value).toString("base64");
+  const encodeBool = (value: boolean) => {
+    const buffer = Buffer.alloc(1);
+
+    buffer.writeUint8(value ? 1 : 0);
+
+    return buffer.toString("base64");
+  };
 
   return {
     decode,
     decodeUInt,
-    encode,
+    encodeBool,
   };
 };
 
