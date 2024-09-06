@@ -1,33 +1,23 @@
 import { Buffer } from "buffer";
 
 const useBase64 = () => {
-  const decode = (value: string) => {
-    return Buffer.from(value, "base64").toString();
-  };
+  const decode = (value: string) => Buffer.from(value, "base64").toString();
 
-  function hexToSignedInt(unsigned: number, bits = 16) {
-    const signBit = 1 << (bits - 1);
+  const decodeUInt = (value: string) =>
+    Buffer.from(value, "base64").readUint8(0);
 
-    return unsigned >= signBit ? unsigned - (1 << bits) : unsigned;
-  }
+  const encodeBool = (value: boolean) => {
+    const buffer = Buffer.alloc(1);
 
-  const decodeDecimal = (value: string, signed = false) => {
-    const unsigned = parseInt(Buffer.from(value, "base64").toString("hex"), 16);
+    buffer.writeUint8(value ? 1 : 0);
 
-    if (signed) return hexToSignedInt(unsigned);
-
-    return unsigned;
-  };
-
-  const encode = (value: string) => {
-    console.log(Buffer.from(value).toString("base64"));
-    return Buffer.from(value).toString("base64");
+    return buffer.toString("base64");
   };
 
   return {
     decode,
-    decodeDecimal,
-    encode,
+    decodeUInt,
+    encodeBool,
   };
 };
 

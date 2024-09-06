@@ -20,10 +20,10 @@ https://github.com/software-mansion/react-native-gesture-handler#readme
 
 ## Flow
 
-| NAME | TYPE           | UUID                                 |
-| ---- | -------------- | ------------------------------------ |
-| DATA | Service        | 5714d9ae-f818-4e30-a787-4df25114551a |
-| FLEX | Characteristic | 7f506c74-66e8-48f0-9a4a-a44248bccf35 |
-| IM   | Characteristic | 682d229d-4810-455d-abff-17cdf71f0b76 |
-| BAT  | Service        | 0x180F (6159)                        |
-| PCT  | Characteristic | 0x2A19 (10777)                       |
+| NAME     | TYPE           | UUID                                 |
+| -------- | -------------- | ------------------------------------ |
+| DATA     | Service        | 5714d9ae-f818-4e30-a787-4df25114551a |
+| ACTIVE   | Characteristic | fa63a784-e25f-4a1f-a976-9cfbfda43a46 |
+| INSTANCE | Characteristic | 7f506c74-66e8-48f0-9a4a-a44248bccf35 |
+| BAT      | Service        | 0x180F                               |
+| PCT      | Characteristic | 0x2A19                               |
