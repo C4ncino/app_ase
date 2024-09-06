@@ -137,14 +137,14 @@ const BLEContextProvider = ({ children }: Props) => {
                 return;
               }
 
-              tempData.push(char.value);
-
-              if (tempData.length === 200) {
-                console.log("hola");
-
-                setData((data) => [...data, tempData]);
-                tempData = [];
+              if (tempData.length === 0) {
+                setTimeout(() => {
+                  setData([...data, tempData]);
+                  tempData = [];
+                }, 1000);
               }
+
+              tempData.push(char.value);
             });
           });
 
