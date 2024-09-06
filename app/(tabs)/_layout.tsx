@@ -1,13 +1,14 @@
 import { Ionicons } from "@expo/vector-icons";
 import DeviceLocalizer from "@/components/DeviceLocalizer";
 import { Tabs } from "expo-router";
+import { Text } from "react-native";
 
 const Layout = () => {
   return (
     <Tabs
       screenOptions={{
         headerRight: () => <DeviceLocalizer />,
-        title: "iGlove",
+        headerTitle: () => <Text className="text-xl font-bold">iGlove</Text>,
       }}
     >
       <Tabs.Screen
