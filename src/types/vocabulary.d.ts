@@ -1,4 +1,7 @@
-type Word = string;
+type Word = {
+  id: number;
+  literal: string;
+};
 type SectionTitle =
   | "Aa"
   | "Bb"
