@@ -1,19 +1,13 @@
 import LoginSvg from "@/svgs/Login";
 import React, { useState } from "react";
-import { Link } from "expo-router";
-import {
-  View,
-  Text,
-  TextInput,
-  Button,
-  TouchableOpacity,
-  StyleSheet,
-  KeyboardAvoidingView,
-  Platform,
-} from "react-native";
+import { Link, router } from "expo-router";
+import { View, Text, TextInput, StyleSheet, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Fontisto from "@expo/vector-icons/Fontisto";
-import Entypo from "@expo/vector-icons/Entypo";
+import { Fontisto, Entypo } from "@expo/vector-icons";
+import { useSessionContext } from "@/hooks/useSessionContext";
+import { errors } from "@/messages/loginMessages";
+import { emailRegex } from "@/utils/regex";
+
 const styles = StyleSheet.create({
   LoginButt: {
     backgroundColor: "#0088cc",
@@ -27,13 +21,37 @@ const styles = StyleSheet.create({
     fontStyle: "normal",
     color: "#FFFFFF",
   },
-
   inputContainer: {
     flexDirection: "row",
   },
 });
+
 export default function Component() {
   const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("");
+  const [error, setError] = useState("");
+
+  const { login } = useSessionContext();
+
+  const handleLogin = async () => {
+    setError("");
+
+    if (!email || !password) {
+      setError(errors[0]);
+      return;
+    }
+
+    if (!emailRegex.test(email)) {
+      setError(errors[1]);
+      return;
+    }
+
+    const success = await login({ email, password });
+
+    if (!success) setError(errors[2]);
+
+    router.push("/");
+  };
 
   return (
     <SafeAreaView className="justify-start items-start w-full h-full px-0">
@@ -56,7 +74,18 @@ export default function Component() {
         <View className=" mt-2">
           <View className="  mt-3  h-12 bg-white flex-row items-center rounded-3xl px-3 focus:border-2 focus:border-blue-300">
             <Entypo name="mail" size={18} color="black" />
-            <TextInput placeholder="E-mail" className="w-full pl-2 text-lg" />
+            <TextInput
+              autoFocus
+              autoComplete="email"
+              inputMode="email"
+              keyboardType="email-address"
+              enterKeyHint="next"
+              autoCapitalize="none"
+              placeholder="Correo"
+              placeholderTextColor={"#6C8693"}
+              className="w-full pl-2 text-lg"
+              onChangeText={setEmail}
+            />
           </View>
         </View>
 
@@ -64,11 +93,13 @@ export default function Component() {
           <View className="  mt-3  h-12 bg-white flex-row items-center rounded-3xl px-3 focus:border-2 focus:border-blue-300">
             <Fontisto name="locked" size={18} color="black" />
             <TextInput
+              secureTextEntry
               placeholder="Contraseña"
+              placeholderTextColor={"#6C8693"}
               className="w-full pl-2 text-lg"
-              secureTextEntry={true}
               value={password}
               onChangeText={setPassword}
+              onEndEditing={handleLogin}
             />
           </View>
         </View>
@@ -79,16 +110,16 @@ export default function Component() {
         >
           <Text>¿Olvidaste tu contraseña?</Text>
         </Link>
-        {/* 
-        <View className="mt-6 10">
-          <Button title="Log In" />
-        </View> */}
 
-        <TouchableOpacity style={styles.LoginButt}>
+        {error && (
+          <Text className="text-red-500 text-center mt-2">{error}</Text>
+        )}
+
+        <Pressable style={styles.LoginButt} onPress={handleLogin}>
           <Text style={styles.textlog} className="font-bold text-lg">
             Iniciar sesión
           </Text>
-        </TouchableOpacity>
+        </Pressable>
 
         <View className="flex-row justify-center mt-4">
           <Text className="text-sm  text-gray-600 mr-1">

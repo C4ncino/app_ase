@@ -9,7 +9,7 @@ const useAPI = () => {
 
   const validate = (status: number) => {
     // TODO: Change to 500 in production
-    return status < 400;
+    return status < 500;
   };
 
   const result = async (response: AxiosResponse<any, any>) => {
@@ -30,6 +30,9 @@ const useAPI = () => {
   };
 
   const post = async (end_point: string, body: string, token?: string) => {
+    console.log(body);
+    console.log(get_endpoint(end_point));
+
     const response = await axios.post(get_endpoint(end_point), body, {
       headers: {
         Authorization: "Bearer " + token,
