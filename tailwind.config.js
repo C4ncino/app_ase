@@ -7,7 +7,6 @@ module.exports = {
   ],
   theme: {
     extend: {
-      
         colors: {
           gray: {
             50: '#F3F5F6',
@@ -49,5 +48,6 @@ module.exports = {
         },
       },
     },
+  },
   plugins: [],
 };

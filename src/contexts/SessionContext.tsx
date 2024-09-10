@@ -5,8 +5,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import useAPI from "@/hooks/useAPI";
 
 export const SessionContext = React.createContext<SessionContextModel>({
-  login: () => new Promise((resolve) => resolve("")),
-  signUp: () => new Promise((resolve) => resolve("")),
+  login: () => new Promise((resolve) => resolve(false)),
+  signUp: () => new Promise((resolve) => resolve(false)),
   logout: () => {},
 });
 
@@ -43,29 +43,27 @@ const SessionContextProvider = ({ children }: Props) => {
     await AsyncStorage.setItem("token", token);
   };
 
-  const login = async () => {
+  const login = async (data: LoginInfo) => {
     // make post request
-    const response = await post("users/login", JSON.stringify({}));
+    const response = await post("users/login", JSON.stringify(data));
 
     if (response) {
       setSessionData(response.data.user, response.data.token);
-      router.navigate("/");
-      return "Todo Listo";
+      return true;
     }
-    return "Algo salio mal...";
+    return false;
   };
 
-  const signUp = async () => {
+  const signUp = async (data: SignupInfo) => {
     // make post request
-    const response = await post("users/login", JSON.stringify({}));
+    const response = await post("users/login", JSON.stringify(data));
 
     if (response) {
       setSessionData(response.data.user, response.data.token);
-      router.navigate("/");
-      return "Todo Listo";
+      return true;
     }
 
-    return "Algo salio mal...";
+    return false;
   };
 
   const logout = async () => {
