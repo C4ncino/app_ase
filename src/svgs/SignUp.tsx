@@ -1,7 +1,7 @@
 import * as React from "react";
 import Svg, { SvgProps, Path, Circle } from "react-native-svg";
 
-const SvgComponent = (props: SvgProps) => (
+const SingUpSvg = (props: SvgProps) => (
   <Svg {...props} viewBox="0 0 745 747">
     <Path
       fill="#f2f2f2"
@@ -148,4 +148,4 @@ const SvgComponent = (props: SvgProps) => (
     />
   </Svg>
 );
-export default SvgComponent;
+export default SingUpSvg;

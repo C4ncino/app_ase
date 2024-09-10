@@ -20,12 +20,23 @@ const Layout = () => {
           ),
         }}
       />
+
       <Tabs.Screen
         name="vocabulary"
         options={{
           title: "Vocabulario",
           tabBarIcon: ({ color }) => (
             <Ionicons name="book" color={color} size={24} />
+          ),
+        }}
+      />
+
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: "Mi Perfil",
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="person" color={color} size={24} />
           ),
         }}
       />
