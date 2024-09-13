@@ -1,6 +1,6 @@
 type Word = {
   id: number;
-  literal: string;
+  word: string;
 };
 type SectionTitle =
   | "Aa"
