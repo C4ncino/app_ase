@@ -34,7 +34,7 @@ const styles = StyleSheet.create({
 const SignUp = () => {
   const [name, setName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [birthDate, setBirthDate] = useState<Date>();
+  const [bday, setBday] = useState<Date>();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [cpassword, setCPassword] = useState("");
@@ -42,8 +42,8 @@ const SignUp = () => {
 
   const { signUp } = useSessionContext();
 
-  const onSubmit = () => {
-    if (!name || !lastName || !birthDate || !email || !password || !cpassword) {
+  const onSubmit = async () => {
+    if (!name || !lastName || !bday || !email || !password || !cpassword) {
       setError(messages[0]);
       return;
     }
@@ -58,17 +58,19 @@ const SignUp = () => {
       return;
     }
 
-    const success = signUp({
+    const success = await signUp({
       name,
-      lastName,
-      birthDate,
+      last_name: lastName,
+      bday,
       email,
       password,
     });
 
-    if (!success) setError(messages[3]);
+    if (success) {
+      router.push("/");
+    }
 
-    router.push("/login");
+    setError(messages[3]);
   };
 
   return (
@@ -83,7 +85,7 @@ const SignUp = () => {
         }}
       />
       <ScrollView className="w-full h-full px-5 rounded-md">
-        <View className="mt-4  h-12 bg-white flex-row items-center rounded-3xl px-3 focus:border-2 focus:border-blue-300">
+        <View className="mt-4 h-12 bg-white flex-row items-center rounded-3xl px-3 focus:border-2 focus:border-blue-300">
           <Entypo name="user" size={18} color="black" />
           <TextInput
             autoFocus
@@ -95,10 +97,11 @@ const SignUp = () => {
             autoComplete="given-name"
             returnKeyType="next"
             enterKeyHint="next"
+            placeholderTextColor={"#8A9EA8"}
           />
         </View>
 
-        <View className="mt-4  h-12 bg-white flex-row items-center rounded-3xl px-3 focus:border-2 focus:border-blue-300">
+        <View className="mt-4 h-12 bg-white flex-row items-center rounded-3xl px-3 focus:border-2 focus:border-blue-300">
           <Entypo name="user" size={18} color="black" />
           <TextInput
             value={lastName}
@@ -109,17 +112,17 @@ const SignUp = () => {
             autoComplete="family-name"
             returnKeyType="next"
             enterKeyHint="next"
+            placeholderTextColor={"#8A9EA8"}
           />
         </View>
 
-        <View className="mt-4  h-12 bg-white flex-row items-center rounded-3xl px-3 focus:border-2 focus:border-blue-300">
+        <View className="mt-4 h-12 bg-white flex-row items-center rounded-3xl px-3 focus:border-2 focus:border-blue-300">
           <FontAwesome5 name="birthday-cake" size={18} color="black" />
 
-          {/* TODO: verify that it works */}
-          {/* <DatePicker date={birthDate} setDate={setBirthDate} /> */}
+          <DatePicker date={bday} setDate={setBday} />
         </View>
 
-        <View className="mt-4  h-12 bg-white flex-row items-center rounded-3xl px-3 focus:border-2 focus:border-blue-300">
+        <View className="mt-4 h-12 bg-white flex-row items-center rounded-3xl px-3 focus:border-2 focus:border-blue-300">
           <Entypo name="mail" size={18} color="black" />
           <TextInput
             value={email}
@@ -131,10 +134,12 @@ const SignUp = () => {
             className="w-full pl-2 text-lg"
             returnKeyType="next"
             enterKeyHint="next"
+            autoCapitalize="none"
+            placeholderTextColor={"#8A9EA8"}
           />
         </View>
 
-        <View className="mt-4  h-12 bg-white flex-row items-center rounded-3xl px-3 focus:border-2 focus:border-blue-300">
+        <View className="mt-4 h-12 bg-white flex-row items-center rounded-3xl px-3 focus:border-2 focus:border-blue-300">
           <Fontisto name="locked" size={16} color="black" />
           <TextInput
             value={password}
@@ -143,21 +148,25 @@ const SignUp = () => {
             className="w-full pl-2 text-lg pr-4"
             returnKeyType="next"
             enterKeyHint="next"
+            autoCapitalize="none"
             secureTextEntry
+            placeholderTextColor={"#8A9EA8"}
           />
         </View>
 
-        <View className="mt-4  h-12 bg-white flex-row items-center rounded-3xl px-3 focus:border-2 focus:border-blue-300">
+        <View className="mt-4 h-12 bg-white flex-row items-center rounded-3xl px-3 focus:border-2 focus:border-blue-300">
           <Fontisto name="locked" size={16} color="black" />
           <TextInput
             value={cpassword}
             onChangeText={setCPassword}
             placeholder="Confirmar contraseña"
             className="w-full pl-2 text-lg pr-4"
-            secureTextEntry
             returnKeyType="send"
             enterKeyHint="send"
+            autoCapitalize="none"
+            secureTextEntry
             onEndEditing={onSubmit}
+            placeholderTextColor={"#8A9EA8"}
           />
         </View>
 

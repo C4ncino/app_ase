@@ -48,7 +48,10 @@ export default function Component() {
 
     const success = await login({ email, password });
 
-    if (!success) setError(errors[2]);
+    if (!success) {
+      setError(errors[2]);
+      return;
+    }
 
     router.push("/");
   };
@@ -82,7 +85,7 @@ export default function Component() {
               enterKeyHint="next"
               autoCapitalize="none"
               placeholder="Correo"
-              placeholderTextColor={"#6C8693"}
+              placeholderTextColor={"#8A9EA8"}
               className="w-full pl-2 text-lg"
               onChangeText={setEmail}
             />
@@ -95,7 +98,7 @@ export default function Component() {
             <TextInput
               secureTextEntry
               placeholder="Contraseña"
-              placeholderTextColor={"#6C8693"}
+              placeholderTextColor={"#8A9EA8"}
               className="w-full pl-2 text-lg"
               value={password}
               onChangeText={setPassword}

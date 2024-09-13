@@ -13,7 +13,7 @@ const DatePicker = ({ date, setDate }: Props) => {
 
   return (
     <>
-      <Pressable onPress={() => setShow(!show)} className="">
+      <Pressable onPress={() => setShow(!show)} className="pl-2">
         {date ? (
           <Text className="text-lg text-center">
             {date.toLocaleDateString()}
