@@ -5,6 +5,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import useEnv from "@/hooks/useEnv";
 import useBase64 from "@/hooks/useBase64";
 import { bleMessages } from "@/messages/bleMessages";
+import { deviceName } from "expo-device";
 
 export const BLEContext = createContext<BLEContextModel>({
   isConnected: false,
@@ -63,15 +64,7 @@ const BLEContextProvider = ({ children }: Props) => {
     };
 
     if (isConnected) updateReceiving();
-  }, [
-    receiving,
-    macAddress,
-    dataUUID,
-    activeUUID,
-    encodeBool,
-    manager,
-    isConnected,
-  ]);
+  }, [receiving]);
 
   const scan = (setMessage: StringSetter) => {
     setMessage(bleMessages[0]);
@@ -96,6 +89,8 @@ const BLEContextProvider = ({ children }: Props) => {
 
           await manager.stopDeviceScan();
           await AsyncStorage.setItem("mac", scannedDevice.id);
+
+          console.log(deviceName);
         }
       }
     );
@@ -175,6 +170,8 @@ const BLEContextProvider = ({ children }: Props) => {
           });
 
           setMessage(bleMessages[5]);
+
+          setIsConnected(true);
         });
     } catch (error) {
       setMessage(bleMessages[4] + " :" + error);

@@ -7,7 +7,7 @@ const DeviceLocalizer = () => {
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState("");
 
-  const { scan, stopScan, connect, forget } = useBleContext();
+  const { scan, stopScan, connect, forget, setReceiving } = useBleContext();
 
   const onOpen = () => {
     setOpen(true);
@@ -45,6 +45,7 @@ const DeviceLocalizer = () => {
           )}
         </View>
         <Button title="Olvidar" onPress={() => forget(setMessage)} />
+        <Button title="reset" onPress={() => setReceiving((r) => !r)} />
       </Modal>
     </>
   );

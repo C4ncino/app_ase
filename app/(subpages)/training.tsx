@@ -2,12 +2,15 @@ import { View, Text, Pressable, ScrollView } from "react-native";
 import CirculoSvg from "@/svgs/Marcos";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
+import { useBleContext } from "@/hooks/useBLEContext";
 
 const Training = () => {
   const { word } = useLocalSearchParams();
 
   const [counter, setCounter] = useState(3);
   const [intervalId, setIntervalId] = useState<NodeJS.Timeout>();
+
+  const { data, setReceiving } = useBleContext();
 
   const countDown = () => {
     const inter = setInterval(() => {
@@ -22,8 +25,20 @@ const Training = () => {
   }, []);
 
   useEffect(() => {
-    if (counter === 0) clearInterval(intervalId);
+    if (counter === 0) {
+      setCounter(3);
+      clearInterval(intervalId);
+    }
+    if (counter === 1) setReceiving((r) => !r);
   }, [counter]);
+
+  useEffect(() => {
+    setReceiving((r) => !r);
+
+    console.log(data.length);
+
+    countDown();
+  }, [data]);
 
   return (
     <ScrollView
