@@ -5,7 +5,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import useEnv from "@/hooks/useEnv";
 import useBase64 from "@/hooks/useBase64";
 import { bleMessages } from "@/messages/bleMessages";
-import { deviceName } from "expo-device";
 
 export const BLEContext = createContext<BLEContextModel>({
   isConnected: false,
@@ -89,8 +88,6 @@ const BLEContextProvider = ({ children }: Props) => {
 
           await manager.stopDeviceScan();
           await AsyncStorage.setItem("mac", scannedDevice.id);
-
-          console.log(deviceName);
         }
       }
     );
@@ -134,7 +131,7 @@ const BLEContextProvider = ({ children }: Props) => {
 
               if (tempData.length === 0) {
                 setTimeout(() => {
-                  setData([...data, tempData]);
+                  setData((d) => [...d, tempData]);
                   tempData = [];
                 }, 1000);
               }
