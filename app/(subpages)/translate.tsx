@@ -35,16 +35,9 @@ const Translate = () => {
     }
   }, [counter]);
 
-  // useEffect(() => {
-  //   if (counter === 0 && intervalId) {
-  //      clearInterval(intervalId);
-  //     setIsPlaying(false);
-  //   }
-  // }, [counter]);
-
   useEffect(() => {
     return () => {
-      if (intervalId) clearInterval(intervalId); // Limpiar el intervalo si el componente se desmonta
+      if (intervalId) clearInterval(intervalId);
     };
   }, [intervalId]);
 
