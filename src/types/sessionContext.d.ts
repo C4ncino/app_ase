@@ -16,8 +16,8 @@ interface LoginInfo {
 
 interface SignupInfo {
   name: string;
-  lastName: string;
-  birthDate: Date;
+  last_name: string;
+  bday: Date;
   email: string;
   password: string;
 }
@@ -28,4 +28,5 @@ interface SessionContextModel {
   login: (data: LoginInfo) => Promise<boolean>;
   signUp: (data: SignupInfo) => Promise<boolean>;
   logout: () => void;
+  refresh: () => Promise<void>;
 }

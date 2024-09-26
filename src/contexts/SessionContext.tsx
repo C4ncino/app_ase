@@ -1,5 +1,5 @@
 import { router } from "expo-router";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import useAPI from "@/hooks/useAPI";
@@ -8,6 +8,7 @@ export const SessionContext = React.createContext<SessionContextModel>({
   login: () => new Promise((resolve) => resolve(false)),
   signUp: () => new Promise((resolve) => resolve(false)),
   logout: () => {},
+  refresh: () => new Promise((resolve) => resolve()),
 });
 
 type Props = {
@@ -19,21 +20,23 @@ const SessionContextProvider = ({ children }: Props) => {
   const [token, setToken] = useState<Token>();
   const { get, post } = useAPI();
 
-  const getToken = useCallback(async () => {
-    const token = await AsyncStorage.getItem("token");
-
-    // if (!token) router.replace("/login");
-
-    const response = await get("users/me", token ? token : "");
-
-    // if (!response) router.replace("/login");
-
-    setUser(response.data);
-  }, [get]);
-
   useEffect(() => {
+    const getToken = async () => {
+      const token = await AsyncStorage.getItem("token");
+
+      if (!token) router.replace("/login");
+
+      const response = await get("users/me", token ? token : "");
+
+      if (!response) logout();
+
+      setUser(response.user);
+
+      refresh();
+    };
+
     getToken();
-  }, [getToken]);
+  }, []);
 
   const setSessionData = async (user: User, token: Token) => {
     setUser(user);
@@ -44,22 +47,20 @@ const SessionContextProvider = ({ children }: Props) => {
   };
 
   const login = async (data: LoginInfo) => {
-    // make post request
     const response = await post("users/login", JSON.stringify(data));
 
     if (response) {
-      setSessionData(response.data.user, response.data.token);
+      await setSessionData(response.user, response.token);
       return true;
     }
     return false;
   };
 
   const signUp = async (data: SignupInfo) => {
-    // make post request
-    const response = await post("users/login", JSON.stringify(data));
+    const response = await post("users/sign-up", JSON.stringify(data));
 
     if (response) {
-      setSessionData(response.data.user, response.data.token);
+      await setSessionData(response.user, response.token);
       return true;
     }
 
@@ -70,9 +71,20 @@ const SessionContextProvider = ({ children }: Props) => {
     setUser(undefined);
 
     setToken(undefined);
+
     await AsyncStorage.removeItem("token");
 
-    router.push("/login");
+    router.replace("/login");
+  };
+
+  const refresh = async () => {
+    const response = await get("users/refresh", token);
+
+    if (!response) await logout();
+
+    setToken(response.token);
+
+    await AsyncStorage.setItem("token", response.token);
   };
 
   const sessionContext: SessionContextModel = {
@@ -81,6 +93,7 @@ const SessionContextProvider = ({ children }: Props) => {
     login,
     signUp,
     logout,
+    refresh,
   };
 
   return (

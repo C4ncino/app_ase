@@ -9,11 +9,15 @@ const useAPI = () => {
 
   const validate = (status: number) => {
     // TODO: Change to 500 in production
-    return status < 500;
+    return status < 600;
   };
 
   const result = async (response: AxiosResponse<any, any>) => {
-    if (response.status !== 200) return false;
+    console.log("🚀 ~ result ~ response:", response);
+    console.log("🚀 ~ result ~ response.status:", response.status);
+    console.log("🚀 ~ result ~ response.data:", response.data);
+
+    if (response.status >= 300) return false;
 
     return response.data;
   };
@@ -30,9 +34,6 @@ const useAPI = () => {
   };
 
   const post = async (end_point: string, body: string, token?: string) => {
-    console.log(body);
-    console.log(get_endpoint(end_point));
-
     const response = await axios.post(get_endpoint(end_point), body, {
       headers: {
         Authorization: "Bearer " + token,
