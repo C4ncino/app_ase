@@ -1,10 +1,6 @@
 Joss:
-    ☐ Hacer pantalla de inicio
-        ☐ Poner boton de iniciar traduccion
-        ☐ Poner svg ilustrativo
-    ☐ Hacer pantalla de Perfil
-        ☐ Svg ilustrativo
-        ☐ Poner campos de nombre y apellidos
-        ☐ Fecha de cumpleanos
-        ☐ Boton para editar info
-        ☐ Fecha en que se unio
+    ☐ Hacer petici'on post a url/train/validate
+    ☐ Checar success
+    ☐ Guardar respuesta
+    ☐ Eliminar smples erroneas
+     

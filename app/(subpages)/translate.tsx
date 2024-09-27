@@ -48,6 +48,12 @@ const Translate = () => {
     });
   }, [data]);
 
+  useEffect(() => {
+    setReceiving(false);
+
+    handlePlayPress();
+  }, []);
+
   const handlePlayPress = () => {
     setIsPlaying(true);
     countDown();
@@ -63,36 +69,40 @@ const Translate = () => {
 
   return (
     <View className="w-full h-full items-center bg-blue-40 py-16 px-0">
-      {isConnected ? (
-        <View className="items-center">
-          <View className="mx-9 bg-blue-30 items-center py-4 rounded-3xl relative w-80 h-5/6">
-            <Text className="text-xl text-gray-400 mt-2 mb-2">Traduciendo</Text>
-            <View className="flex-1 px-4 mt-2">
-              <Text className="text-justify text-lg"> </Text>
-            </View>
-            {isPlaying && counter > 0 && (
-              <Text className="text-6xl  text-gray-600 ">{counter}</Text>
-            )}
+      {/* {isConnected ? ( */}
+      <View className="items-center">
+        <View className="mx-9 bg-blue-30 items-center py-4 rounded-3xl relative w-80 h-5/6">
+          <Text className="text-xl text-gray-400 mt-2 mb-2">
+            {receiving ? "Traduciendo" : "Pulsa play para iniciar"}
+          </Text>
+          <View className="flex-1 px-4 mt-2">
+            <Text className="text-justify text-lg"> </Text>
           </View>
-
-          <View className="flex flex-row mt-4">
-            <Pressable
-              className="w-24 h-24 justify-center rounded-full bg-white items-center mr-4"
-              onPress={handlePlayPress}
-            >
-              <Entypo name="controller-play" size={70} color="#35a766" />
-            </Pressable>
-            <Pressable
-              className="w-24 h-24 justify-center rounded-full bg-white items-center"
-              onPress={handleStopPress}
-            >
-              <Entypo name="controller-stop" size={70} color="#d12115" />
-            </Pressable>
-          </View>
+          {isPlaying && counter > 0 && (
+            <Text className="text-6xl  text-gray-600 ">{counter}</Text>
+          )}
         </View>
+
+        <View className="flex flex-row mt-4">
+          <Pressable
+            className="w-24 h-24 justify-center rounded-full bg-white items-center mr-4"
+            onPress={handlePlayPress}
+          >
+            <Entypo name="controller-play" size={70} color="#35a766" />
+          </Pressable>
+          <Pressable
+            className="w-24 h-24 justify-center rounded-full bg-white items-center"
+            onPress={handleStopPress}
+          >
+            <Entypo name="controller-stop" size={70} color="#d12115" />
+          </Pressable>
+        </View>
+      </View>
+      {/* 
       ) : (
-        <Text>No se encontró un guante</Text>
+         <Text>No se encontró un guante</Text>
       )}
+          */}
     </View>
   );
 };

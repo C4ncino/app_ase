@@ -18,37 +18,37 @@ const WordListItem = ({ word }: Props) => {
   const { token, refresh } = useSessionContext();
 
   const onUpdate = async () => {
-    const response = await put(
-      `words/${word.id}`,
-      JSON.stringify({ word: localWord }),
-      token
-    );
+    // const response = await put(
+    //   `words/${word.id}`,
+    //   JSON.stringify({ word: localWord }),
+    //   token
+    // );
 
-    if (response) {
-      setWord(response.word.word);
-      setIsEditing(false);
-      const words = await AsyncStorage.getItem("words");
+    // if (response) {
+    // setWord(response.word.word);
+    setIsEditing(false);
+    //   const words = await AsyncStorage.getItem("words");
 
-      if (words) {
-        const wordsList: WordList[] = JSON.parse(words);
+    //   if (words) {
+    //     const wordsList: WordList[] = JSON.parse(words);
 
-        const updatedWordsList = wordsList.map((list) => {
-          list.data.map((w) => {
-            if (w.id === word.id) {
-              w.word = response.word;
-            }
+    //     const updatedWordsList = wordsList.map((list) => {
+    //       list.data.map((w) => {
+    //         if (w.id === word.id) {
+    //           w.word = response.word;
+    //         }
 
-            return w;
-          });
+    //         return w;
+    //       });
 
-          return list;
-        });
+    //       return list;
+    //     });
 
-        await AsyncStorage.setItem("words", JSON.stringify(updatedWordsList));
-      }
+    //     await AsyncStorage.setItem("words", JSON.stringify(updatedWordsList));
+    //   }
 
-      await refresh();
-    }
+    //   await refresh();
+    // }
   };
 
   const onEditing = () => {

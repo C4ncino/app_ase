@@ -10,35 +10,104 @@ import useAPI from "@/hooks/useAPI";
 import { useSessionContext } from "@/hooks/useSessionContext";
 
 const Vocabulary = () => {
-  const [wordsLists, setWordsLists] = useState<WordList[]>([]);
+  const [wordsLists, setWordsLists] = useState<WordList[]>([
+    {
+      title: "Aa",
+      data: [
+        {
+          id: 1,
+          word: "Abaco",
+        },
+        {
+          id: 2,
+          word: "Abeja",
+        },
+        {
+          id: 3,
+          word: "Abismo",
+        },
+      ],
+    },
+    {
+      title: "Bb",
+      data: [
+        {
+          id: 1,
+          word: "Baba",
+        },
+        {
+          id: 2,
+          word: "Baba",
+        },
+        {
+          id: 3,
+          word: "Baba",
+        },
+      ],
+    },
+    {
+      title: "Cc",
+      data: [
+        {
+          id: 1,
+          word: "Cacho",
+        },
+        {
+          id: 2,
+          word: "Cacho",
+        },
+        {
+          id: 3,
+          word: "Cacho",
+        },
+      ],
+    },
+    {
+      title: "Dd",
+      data: [
+        {
+          id: 1,
+          word: "Dedo",
+        },
+        {
+          id: 2,
+          word: "Dedo",
+        },
+        {
+          id: 3,
+          word: "Dedo",
+        },
+      ],
+    },
+  ]);
 
   const { get } = useAPI();
   const { user, token, refresh } = useSessionContext();
 
-  useFocusEffect(
-    useCallback(() => {
-      const getWords = async () => {
-        const dbWords = await AsyncStorage.getItem("words");
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     const getWords = async () => {
+  //       const dbWords = await AsyncStorage.getItem("words");
 
-        if (dbWords && dbWords !== "[]") setWordsLists(JSON.parse(dbWords));
+  //       if (dbWords && dbWords !== "[]") setWordsLists(JSON.parse(dbWords));
 
-        if (!user && !token) router.replace("/login");
+  //       // if (!user && !token) router.replace("/login");
 
-        const response = await get(`words/${user?.id}`, token);
+  //       const response = await get(`words/${user?.id}`, token);
 
-        if (response) {
-          if (dbWords && JSON.stringify(response.words) === dbWords) return;
+  //       if (response) {
+  //         if (dbWords && JSON.stringify(response.words) === dbWords) return;
 
-          setWordsLists(response.words);
-          await AsyncStorage.setItem("words", JSON.stringify(response.words));
+  //         setWordsLists(response.words);
+  //         await AsyncStorage.setItem("words", JSON.stringify(response.words));
 
-          refresh();
-        }
-      };
+  //         refresh();
+  //       }
+  //     };
 
-      getWords();
-    }, [user, token])
-  );
+  //     getWords();
+  //   }, [user, token])
+  // );
 
   return (
     <SafeAreaView>
