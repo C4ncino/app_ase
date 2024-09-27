@@ -45,7 +45,6 @@ const DeviceLocalizer = () => {
           )}
         </View>
         <Button title="Olvidar" onPress={() => forget(setMessage)} />
-        <Button title="reset" onPress={() => setReceiving((r) => !r)} />
       </Modal>
     </>
   );

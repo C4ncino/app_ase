@@ -74,7 +74,7 @@ const SessionContextProvider = ({ children }: Props) => {
 
     await AsyncStorage.removeItem("token");
 
-    // router.replace("/login");
+    router.replace("/login");
   };
 
   const refresh = async () => {
