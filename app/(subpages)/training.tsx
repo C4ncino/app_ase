@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useBleContext } from "@/hooks/useBLEContext";
 import useAPI from "@/hooks/useAPI";
 import { useSessionContext } from "@/hooks/useSessionContext";
+import { sensor_data } from "@/messages/test";
 
 const Training = () => {
   const { word } = useLocalSearchParams();
@@ -14,6 +15,7 @@ const Training = () => {
 
   const [intervalValidateId, setIntervalValidateId] =
     useState<NodeJS.Timeout>();
+
   const [taskId, setTaskId] = useState("");
 
   const { data, setReceiving, receiving, isConnected, setData } =
@@ -21,8 +23,6 @@ const Training = () => {
 
   const { token } = useSessionContext();
   const { post, get } = useAPI();
-
-  const glove_data: number[] = [1, 2];
 
   const countDown = () => {
     const inter = setInterval(() => {
@@ -35,19 +35,30 @@ const Training = () => {
   const validate = async () => {
     const response = await post(
       "train/validate",
-      JSON.stringify({ sensor_data: glove_data }),
+      JSON.stringify({ sensor_data: sensor_data }),
       token
     );
 
-    console.log("🚀 ~ validate ~ response:", response);
+    if (response) {
+      // TODO: delete bad samples
+      setTaskId(response.task);
 
-    const intervalId = setInterval(async () => {
-      const response = await get(`train/validate/${taskId}`, token);
+      const intervalId = setInterval(async () => {
+        const responseTask = await get(
+          `train/validate/${response.task}`,
+          token
+        );
 
-      console.log("🚀 ~ intervalId ~ response:", response);
-    }, 1000);
+        if (responseTask && responseTask.ready) {
+          // TODO delete bad samples
+          console.log(responseTask.bad_samples);
 
-    setIntervalValidateId(intervalId);
+          clearInterval(intervalId);
+        }
+      }, 1000);
+
+      setIntervalValidateId(intervalId);
+    }
   };
 
   useEffect(() => {

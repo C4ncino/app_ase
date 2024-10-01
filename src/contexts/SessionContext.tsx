@@ -32,7 +32,7 @@ const SessionContextProvider = ({ children }: Props) => {
 
       setUser(response.user);
 
-      refresh();
+      // refresh();
     };
 
     getToken();

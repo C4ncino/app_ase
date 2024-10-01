@@ -11,4 +11,4 @@ type Frame = {
 
 type Movement = Frame[];
 
-type Training_data = Movement[];
+type TrainingData = Movement[];
