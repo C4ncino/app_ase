@@ -7,10 +7,10 @@ const LogoutButton = () => {
   return (
     <View className="mr-4">
       <Pressable
-        className="rounded-full W-auto h-10 justify-center items-center  bg-red-300 px-4"
+        className="rounded-full W-auto h-10 justify-center items-center px-4"
         onPress={logout}
       >
-        <Text className="font-semibold text-white text-base">
+        <Text className="font-semibold text-red-300 text-base">
           {" "}
           Cerrar sesión
         </Text>

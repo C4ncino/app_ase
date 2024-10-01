@@ -2,6 +2,7 @@ import { View, Text, Pressable } from "react-native";
 import { useSessionContext } from "@/hooks/useSessionContext";
 import { router } from "expo-router";
 import TranslateSVG from "@/svgs/Translate";
+import SaveBase64ToFile from "@/components/Save";
 
 const Home = () => {
   const session = useSessionContext();
@@ -30,6 +31,8 @@ const Home = () => {
           Iniciar traducción
         </Text>
       </Pressable>
+
+      <SaveBase64ToFile base64Data={"aG9sYQ=="} fileName={"hola.txt"} />
     </View>
   );
 };
