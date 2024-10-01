@@ -1,12 +1,21 @@
 import { useSessionContext } from "@/hooks/useSessionContext";
-import { View, Text, Button } from "react-native";
+import { View, Text, Button, Pressable } from "react-native";
 
 const LogoutButton = () => {
   const { logout } = useSessionContext();
 
   return (
     <View className="mr-4">
-      <Button title="Logout" onPress={logout} color={"red"} />
+      <Pressable
+        className="rounded-full W-auto h-10 justify-center items-center  bg-red-300 px-4"
+        onPress={logout}
+      >
+        <Text className="font-semibold text-white text-base">
+          {" "}
+          Cerrar sesión
+        </Text>
+      </Pressable>
+      {/* <Button title="Logout" onPress={logout} color={"red"} /> */}
     </View>
   );
 };

@@ -61,16 +61,11 @@ const Home = () => {
 
           <View className="flex-row justify-between items-center mx-4 py-1 border-b-2 border-blue-400 mb-3">
             <Text className=" mb-5- px-4 text-lg   ">Cumpleaños:</Text>
-            <Text className=" px-4 text-lg  ">
-              {user?.birthDate.toString()}
-            </Text>
+            <Text className=" px-4 text-lg  ">{user?.birthDate}</Text>
           </View>
           <View className="flex-row justify-between items-center mx-4 py-1 border-b-2 border-blue-400 mb-3">
             <Text className=" mb-5- px-4 text-lg   ">Se unió desde:</Text>
-            <Text className=" px-4 text-lg  ">
-              {" "}
-              {user?.creationDate.toString()}
-            </Text>
+            <Text className=" px-4 text-lg  "> {user?.creationDate}</Text>
           </View>
           <View className=" flex-row justify-between items-center mx-4 py-1 border-b-2 border-blue-400 mb-6">
             <Text className=" mb-5-  px-4 text-lg   ">Número de palabras:</Text>

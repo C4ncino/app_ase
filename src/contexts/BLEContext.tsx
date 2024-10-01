@@ -178,14 +178,14 @@ const BLEContextProvider = ({ children }: Props) => {
   const forget = async (setMessage: StringSetter) => {
     console.log(data.map((d) => d.map((dd) => decode(dd))));
 
-    // setMacAddress("");
-    // setIsConnected(false);
-    // setData([]);
-    // await AsyncStorage.removeItem("mac");
+    setMacAddress("");
+    setIsConnected(false);
+    setData([]);
+    await AsyncStorage.removeItem("mac");
 
-    // if (isConnected) {
-    //   manager.cancelDeviceConnection(macAddress);
-    // }
+    if (isConnected) {
+      manager.cancelDeviceConnection(macAddress);
+    }
 
     setMessage(bleMessages[6]);
   };
