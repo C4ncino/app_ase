@@ -1,14 +1,29 @@
-import { View, Text, Pressable, ScrollView } from "react-native";
+import { View, Text, Pressable, ScrollView, Button } from "react-native";
 import CirculoSvg from "@/svgs/Marcos";
-import { router, useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { useBleContext } from "@/hooks/useBLEContext";
+import useAPI from "@/hooks/useAPI";
+import { useSessionContext } from "@/hooks/useSessionContext";
 
 const Training = () => {
   const { word } = useLocalSearchParams();
+
   const [counter, setCounter] = useState(3);
   const [intervalId, setIntervalId] = useState<NodeJS.Timeout>();
-  const { data, setReceiving, receiving, isConnected } = useBleContext();
+
+  const [intervalValidateId, setIntervalValidateId] =
+    useState<NodeJS.Timeout>();
+  const [taskId, setTaskId] = useState("");
+
+  const { data, setReceiving, receiving, isConnected, setData } =
+    useBleContext();
+
+  const { token } = useSessionContext();
+  const { post, get } = useAPI();
+
+  const glove_data: number[] = [1, 2];
+
   const countDown = () => {
     const inter = setInterval(() => {
       setCounter((c) => (c > 0 ? c - 1 : 0));
@@ -17,8 +32,27 @@ const Training = () => {
     setIntervalId(inter);
   };
 
+  const validate = async () => {
+    const response = await post(
+      "train/validate",
+      JSON.stringify({ sensor_data: glove_data }),
+      token
+    );
+
+    console.log("🚀 ~ validate ~ response:", response);
+
+    const intervalId = setInterval(async () => {
+      const response = await get(`train/validate/${taskId}`, token);
+
+      console.log("🚀 ~ intervalId ~ response:", response);
+    }, 1000);
+
+    setIntervalValidateId(intervalId);
+  };
+
   useEffect(() => {
     if (isConnected) countDown();
+    setData([]);
   }, [isConnected]);
 
   useEffect(() => {
@@ -33,25 +67,17 @@ const Training = () => {
         countDown();
         setCounter(3);
         break;
-
-      default:
-        break;
     }
   }, [counter]);
 
   useEffect(() => {
-    console.log("recibiendo: ", receiving);
-
     if (receiving) {
       setReceiving((r) => !r);
       setCounter(-1);
     }
 
-    console.log(data.length);
-
-    data.map((d) => {
-      console.log(d.length);
-    });
+    if (data.length === 20) {
+    }
   }, [data]);
 
   return (
@@ -100,6 +126,8 @@ const Training = () => {
       ) : (
         <Text>No se encontró un guante</Text>
       )}
+
+      <Button title="Validar" onPress={validate} />
     </ScrollView>
   );
 };

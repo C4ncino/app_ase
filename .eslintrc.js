@@ -5,7 +5,6 @@ module.exports = {
   extends: ["expo", "prettier"],
   rules: {
     "prettier/prettier": "error",
-    indent: ["error", 2],
     "linebreak-style": ["error", "windows"],
   },
   settings: {
