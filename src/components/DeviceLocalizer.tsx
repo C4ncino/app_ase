@@ -4,6 +4,7 @@ import { useState } from "react";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { View, Text, Modal, ActivityIndicator, Pressable } from "react-native";
 import BatteryLevel from "./BatteryLevel";
+import { Feather } from "@expo/vector-icons";
 
 const DeviceLocalizer = () => {
   const [open, setOpen] = useState(false);
@@ -49,11 +50,26 @@ const DeviceLocalizer = () => {
         </View>
 
         <View className="mx-4 my-48 justify-center items-center">
-          {!isConnected ? (
-            <ActivityIndicator size={72} color="#0088cc" />
-          ) : (
-            <FontAwesome6 name="circle-check" size={72} color="green" />
-          )}
+          <View style={{ width: 72, height: 72 }}>
+            {!isConnected ? (
+              <>
+                {message === bleMessages[3] ? (
+                  <ActivityIndicator size={72} color="#0088cc" />
+                ) : message === bleMessages[6] ? (
+                  <Feather name="x-circle" size={72} color="red" />
+                ) : (
+                  <FontAwesome6
+                    name="hand-sparkles"
+                    size={56}
+                    color="#66CCFF"
+                  />
+                )}
+              </>
+            ) : (
+              <FontAwesome6 name="circle-check" size={72} color="green" />
+            )}
+          </View>
+
           {message && <Text className="mt-4">{message}</Text>}
 
           {message && message === bleMessages[6] ? (

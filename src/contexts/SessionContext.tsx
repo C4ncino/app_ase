@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import useAPI from "@/hooks/useAPI";
+import { useBleContext } from "@/hooks/useBLEContext";
 
 export const SessionContext = React.createContext<SessionContextModel>({
   login: () => new Promise((resolve) => resolve(false)),
@@ -19,6 +20,8 @@ const SessionContextProvider = ({ children }: Props) => {
   const [user, setUser] = useState<User>();
   const [token, setToken] = useState<Token>();
   const { get, post } = useAPI();
+
+  const { forget } = useBleContext();
 
   useEffect(() => {
     const getToken = async () => {
@@ -91,6 +94,8 @@ const SessionContextProvider = ({ children }: Props) => {
     setToken(undefined);
 
     await AsyncStorage.removeItem("token");
+
+    forget();
 
     router.replace("/login");
   };
