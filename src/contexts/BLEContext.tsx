@@ -33,7 +33,7 @@ const BLEContextProvider = ({ children }: Props) => {
   const [receiving, setReceiving] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
 
-  const { decodeUInt, decode, encodeBool } = useBase64();
+  const { decodeUInt, encodeBool } = useBase64();
   const {
     blePrefix,
     dataUUID,
@@ -54,7 +54,7 @@ const BLEContextProvider = ({ children }: Props) => {
 
   useEffect(() => {
     const updateReceiving = async () => {
-      await manager.writeCharacteristicWithResponseForDevice(
+      await manager.writeCharacteristicWithoutResponseForDevice(
         macAddress,
         dataUUID,
         activeUUID,
@@ -162,12 +162,14 @@ const BLEContextProvider = ({ children }: Props) => {
                 return;
               }
 
-              setBatteryLevel(decodeUInt(char.value));
+              const level = decodeUInt(char.value);
+
+              if (level !== batteryLevel)
+                setBatteryLevel(decodeUInt(char.value));
             });
           });
 
           setMessage(bleMessages[5]);
-
           setIsConnected(true);
         });
     } catch (error) {
@@ -176,18 +178,16 @@ const BLEContextProvider = ({ children }: Props) => {
   };
 
   const forget = async (setMessage: StringSetter) => {
-    console.log(data.map((d) => d.map((dd) => decode(dd))));
+    setMacAddress("");
+    setData([]);
+    await AsyncStorage.removeItem("mac");
 
-    // setMacAddress("");
-    // setIsConnected(false);
-    // setData([]);
-    // await AsyncStorage.removeItem("mac");
-
-    // if (isConnected) {
-    //   manager.cancelDeviceConnection(macAddress);
-    // }
+    if (isConnected) {
+      manager.cancelDeviceConnection(macAddress);
+    }
 
     setMessage(bleMessages[6]);
+    setIsConnected(false);
   };
 
   const bleContext: BLEContextModel = {

@@ -1,8 +1,8 @@
 import { View, Text, Pressable, TextInput, ScrollView } from "react-native";
 import TrainSvg from "@/svgs/Train";
 import CirculoSvg from "@/svgs/Marcos";
-import { router } from "expo-router";
-import { useState } from "react";
+import { router, useFocusEffect } from "expo-router";
+import { useCallback, useState } from "react";
 
 const Train = () => {
   const [word, stword] = useState("");
@@ -21,6 +21,12 @@ const Train = () => {
     // NO Muestras error
     // SI mueves ruta
   };
+
+  useFocusEffect(
+    useCallback(() => {
+      stword("");
+    }, [])
+  );
 
   return (
     <ScrollView

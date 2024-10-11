@@ -1,19 +1,9 @@
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  Pressable,
-  ScrollView,
-} from "react-native";
+import { View, Text, ScrollView } from "react-native";
 import { useSessionContext } from "@/hooks/useSessionContext";
-import { Link } from "expo-router";
-import { SafeAreaView } from "react-native-safe-area-context";
 import ProfileSvg from "@/svgs/Profile";
-import { Feather } from "@expo/vector-icons";
 
 const Home = () => {
   const { user } = useSessionContext();
-  const session = useSessionContext();
 
   return (
     <ScrollView className="bg-blue-40">
@@ -35,11 +25,9 @@ const Home = () => {
 
         <View className="mt-44 w-full items-center">
           <Text className="items-center font-semibold text-lg">
-            {user?.name}Carlos
+            {user?.name}
           </Text>
-          <Text className="items-center  text-lg">
-            {user?.lastName}Cancino Escobar
-          </Text>
+          <Text className="items-center  text-lg">{user?.last_name}</Text>
         </View>
         <View className="  mx-9 mt-8 bg-white py-4 rounded-3xl  w-80 h-auto ">
           <View className="flex-row justify-between px-8 mt-4 ">
@@ -62,14 +50,13 @@ const Home = () => {
           <View className="flex-row justify-between items-center mx-4 py-1 border-b-2 border-blue-400 mb-3">
             <Text className=" mb-5- px-4 text-lg   ">Cumpleaños:</Text>
             <Text className=" px-4 text-lg  ">
-              {user?.birthDate.toString()}
+              {user?.bday.toLocaleDateString()}
             </Text>
           </View>
           <View className="flex-row justify-between items-center mx-4 py-1 border-b-2 border-blue-400 mb-3">
             <Text className=" mb-5- px-4 text-lg   ">Se unió desde:</Text>
             <Text className=" px-4 text-lg  ">
-              {" "}
-              {user?.creationDate.toString()}
+              {user?.creationDate.toLocaleDateString()}
             </Text>
           </View>
           <View className=" flex-row justify-between items-center mx-4 py-1 border-b-2 border-blue-400 mb-6">

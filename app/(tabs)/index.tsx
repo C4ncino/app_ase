@@ -2,6 +2,9 @@ import { View, Text, Pressable } from "react-native";
 import { useSessionContext } from "@/hooks/useSessionContext";
 import { router } from "expo-router";
 import TranslateSVG from "@/svgs/Translate";
+import SaveBase64ToFile from "@/components/Save";
+import { useBleContext } from "@/hooks/useBLEContext";
+import { useEffect } from "react";
 
 const Home = () => {
   const session = useSessionContext();

@@ -26,20 +26,35 @@ const SessionContextProvider = ({ children }: Props) => {
 
       // if (!token) router.replace("/login");
 
-      const response = await get("users/me", token ? token : "");
+      // const response = await get("users/me", token ? token : "");
 
-      if (!response) logout();
+      // if (!response) logout();
 
-      setUser(response.user);
-
-      refresh();
+      // setSessionData(response.user, token);
     };
 
     getToken();
   }, []);
 
-  const setSessionData = async (user: User, token: Token) => {
-    setUser(user);
+  const convertDateString = (dateStr: string) => {
+    const [datePart, timePart] = dateStr.split(" ");
+
+    const [day, month, year] = datePart.split("-");
+
+    const formattedDateString = `${year}-${month}-${day}T${timePart}`;
+
+    return new Date(formattedDateString);
+  };
+
+  const setSessionData = async (user: UserResponse, token: Token) => {
+    setUser({
+      id: user.id,
+      name: user.name,
+      last_name: user.last_name,
+      email: user.email,
+      bday: new Date(user.bday),
+      creationDate: convertDateString(user.creationDate),
+    });
 
     setToken(token);
 

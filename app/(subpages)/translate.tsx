@@ -1,7 +1,8 @@
 import { View, Text, Pressable, ScrollView } from "react-native";
 import Entypo from "@expo/vector-icons/Entypo";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useBleContext } from "@/hooks/useBLEContext";
+import { useFocusEffect } from "expo-router";
 
 const Translate = () => {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -16,11 +17,20 @@ const Translate = () => {
     setIntervalId(inter);
   };
 
+  useFocusEffect(
+    useCallback(() => {
+      return () => {
+        console.log("receiving false");
+        setReceiving(false);
+      };
+    }, [])
+  );
+
   useEffect(() => {
     switch (counter) {
       case 0:
         clearInterval(intervalId);
-        setIsPlaying(false);
+        // setIsPlaying(false);
         break;
       case 1:
         setReceiving(true);
@@ -50,7 +60,6 @@ const Translate = () => {
 
   useEffect(() => {
     setReceiving(false);
-
     handlePlayPress();
   }, []);
 
@@ -84,18 +93,21 @@ const Translate = () => {
         </View>
 
         <View className="flex flex-row mt-4">
-          <Pressable
-            className="w-24 h-24 justify-center rounded-full bg-white items-center mr-4"
-            onPress={handlePlayPress}
-          >
-            <Entypo name="controller-play" size={70} color="#35a766" />
-          </Pressable>
-          <Pressable
-            className="w-24 h-24 justify-center rounded-full bg-white items-center"
-            onPress={handleStopPress}
-          >
-            <Entypo name="controller-stop" size={70} color="#d12115" />
-          </Pressable>
+          {!isPlaying ? (
+            <Pressable
+              className="w-24 h-24 justify-center rounded-full bg-white items-center"
+              onPress={handlePlayPress}
+            >
+              <Entypo name="controller-play" size={70} color="#35a766" />
+            </Pressable>
+          ) : (
+            <Pressable
+              className="w-24 h-24 justify-center rounded-full bg-white items-center"
+              onPress={handleStopPress}
+            >
+              <Entypo name="controller-stop" size={70} color="#d12115" />
+            </Pressable>
+          )}
         </View>
       </View>
       {/* 

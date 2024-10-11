@@ -1,7 +1,7 @@
 import { View, Text, Pressable, ScrollView } from "react-native";
 import CirculoSvg from "@/svgs/Marcos";
-import { router, useLocalSearchParams } from "expo-router";
-import { useEffect, useState } from "react";
+import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
+import { useCallback, useEffect, useState } from "react";
 import { useBleContext } from "@/hooks/useBLEContext";
 import useAPI from "@/hooks/useAPI";
 import { useSessionContext } from "@/hooks/useSessionContext";
@@ -26,6 +26,14 @@ const Training = () => {
 
     setIntervalId(inter);
   };
+
+  useFocusEffect(
+    useCallback(() => {
+      return () => {
+        setReceiving(false);
+      };
+    }, [])
+  );
 
   useEffect(() => {
     // if (isConnected)
