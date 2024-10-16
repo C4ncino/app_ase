@@ -3,7 +3,7 @@ import axios, { AxiosResponse } from "axios";
 const useAPI = () => {
   const get_endpoint = (end_point: string) => {
     const api_url = process.env.EXPO_PUBLIC_API_URL;
-
+    console.log(api_url);
     return api_url + end_point;
   };
 

@@ -5,10 +5,12 @@ import TranslateSVG from "@/svgs/Translate";
 import SaveBase64ToFile from "@/components/Save";
 import { useBleContext } from "@/hooks/useBLEContext";
 import { useEffect } from "react";
+import useEnv from "@/hooks/useEnv";
 
 const Home = () => {
   const session = useSessionContext();
-
+  const { apiURL } = useEnv();
+  console.log(apiURL);
   return (
     <View className="justify-start bg-blue-40 items-center w-full h-full ">
       <View
