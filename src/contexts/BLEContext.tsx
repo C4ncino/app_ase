@@ -131,7 +131,11 @@ const BLEContextProvider = ({ children }: Props) => {
 
               if (tempData.length === 0) {
                 setTimeout(() => {
-                  setData((d) => [...d, tempData]);
+                  console.log("🚀 ~ tempData:", tempData.length);
+
+                  if (tempData.length >= 55) {
+                    setData((d) => [...d, tempData]);
+                  }
                   tempData = [];
                 }, 1000);
               }
@@ -176,8 +180,6 @@ const BLEContextProvider = ({ children }: Props) => {
   };
 
   const forget = async (setMessage: StringSetter) => {
-    console.log(data.map((d) => d.map((dd) => decode(dd))));
-
     setMacAddress("");
     setIsConnected(false);
     setData([]);

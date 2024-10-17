@@ -1,4 +1,11 @@
-import { View, Text, Pressable, ScrollView, Button } from "react-native";
+import {
+  View,
+  Text,
+  Pressable,
+  ScrollView,
+  Button,
+  ActivityIndicator,
+} from "react-native";
 import CirculoSvg from "@/svgs/Marcos";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
@@ -13,6 +20,8 @@ const Training = () => {
   const [counter, setCounter] = useState(3);
   const [intervalId, setIntervalId] = useState<NodeJS.Timeout>();
 
+  const [isPlaying, setIsPlaying] = useState(true);
+
   const [intervalValidateId, setIntervalValidateId] =
     useState<NodeJS.Timeout>();
 
@@ -25,11 +34,21 @@ const Training = () => {
   const { post, get } = useAPI();
 
   const countDown = () => {
+    setIsPlaying(true);
+
     const inter = setInterval(() => {
+      console.log(inter);
       setCounter((c) => (c > 0 ? c - 1 : 0));
     }, 1000);
 
     setIntervalId(inter);
+  };
+
+  const reset = () => {
+    setReceiving(false);
+    clearInterval(intervalId);
+    setCounter(3);
+    setIsPlaying(false);
   };
 
   const validate = async () => {
@@ -40,24 +59,8 @@ const Training = () => {
     );
 
     if (response) {
-      // TODO: delete bad samples
+      setData((d) => d.filter((_, i) => !response.bad_samples.includes(i)));
       setTaskId(response.task);
-
-      const intervalId = setInterval(async () => {
-        const responseTask = await get(
-          `train/validate/${response.task}`,
-          token
-        );
-
-        if (responseTask && responseTask.ready) {
-          // TODO delete bad samples
-          console.log(responseTask.bad_samples);
-
-          clearInterval(intervalId);
-        }
-      }, 1000);
-
-      setIntervalValidateId(intervalId);
     }
   };
 
@@ -72,24 +75,44 @@ const Training = () => {
         clearInterval(intervalId);
         break;
       case 1:
-        setReceiving((r) => !r);
+        setReceiving(true);
         break;
       case -1:
-        countDown();
         setCounter(3);
+        countDown();
         break;
     }
   }, [counter]);
 
   useEffect(() => {
-    if (receiving) {
-      setReceiving((r) => !r);
-      setCounter(-1);
-    }
+    if (taskId === "") {
+      if (receiving) {
+        setReceiving(false);
+        setCounter(-1);
+      }
 
-    if (data.length === 20) {
+      if (data.length === 20) {
+        validate();
+      }
     }
   }, [data]);
+
+  useEffect(() => {
+    if (taskId) {
+      const intervalId = setInterval(async () => {
+        const response = await get(`train/validate/${taskId}`, token);
+
+        if (response && response.ready) {
+          setData((d) => d.filter((_, i) => !response.bad_samples.includes(i)));
+          console.log(response.bad_samples);
+
+          clearInterval(intervalValidateId);
+        }
+      }, 1000);
+
+      setIntervalValidateId(intervalId);
+    }
+  }, [taskId]);
 
   return (
     <ScrollView
@@ -98,41 +121,64 @@ const Training = () => {
     >
       {isConnected ? (
         <View className="items-center bg-blue-40 w-full h-full py-6 px-6">
-          <Text className=" mt-3 font-semibold text-lg text-blue-800">
-            El entrenamiento comienza en:
-          </Text>
-          <View className="justify-center items-center relative mt-28 mb-28">
-            <View
-              style={{
-                justifyContent: "center",
-                alignItems: "center",
-                width: 280,
-                height: 280,
-                position: "absolute",
-              }}
-            >
-              <CirculoSvg width="120%" height="120%" />
+          {data.length >= 20 ? (
+            <View className="w-full justify-center items-center gap-5">
+              <ActivityIndicator />
+              <Text>Espera un momento</Text>
             </View>
-            <View className="mt-4">
-              <Text className=" font-semibold text-9xl text-blue-800">
-                {counter >= 0 ? counter : 0}
+          ) : (
+            <>
+              <Text className=" mt-3 font-semibold text-lg text-blue-800">
+                El entrenamiento comienza en:
               </Text>
-            </View>
-          </View>
-          <Pressable
-            onPress={() => {}}
-            className="mt-5 justify-center bg-blue-300 h-14 w-72 rounded-3xl "
-          >
-            <Text className="w-72 text-center font-bold text-lg text-white">
-              Pausar
-            </Text>
-          </Pressable>
-          <View className="mt-5 w-72 h-14 flex-row items-center justify-center">
-            <Text className="items-center text-lg text-gray-500 ">
-              Número de entrenamientos:{" "}
-            </Text>
-            <Text className="items-center text-lg text-gray-500">3</Text>
-          </View>
+              <View className="justify-center items-center relative mt-28 mb-28">
+                <View
+                  style={{
+                    justifyContent: "center",
+                    alignItems: "center",
+                    width: 280,
+                    height: 280,
+                    position: "absolute",
+                  }}
+                >
+                  <CirculoSvg width="120%" height="120%" />
+                </View>
+                <View className="mt-4">
+                  <Text className=" font-semibold text-9xl text-blue-800">
+                    {isPlaying ? (
+                      <>{counter >= 0 ? counter : 0}</>
+                    ) : (
+                      <Text>A</Text>
+                    )}
+                  </Text>
+                </View>
+              </View>
+              {isPlaying ? (
+                <Pressable
+                  onPress={reset}
+                  className="mt-5 justify-center bg-orange-300 h-14 w-72 rounded-3xl "
+                >
+                  <Text className="w-72 text-center font-bold text-lg text-white">
+                    Pausar
+                  </Text>
+                </Pressable>
+              ) : (
+                <Pressable
+                  onPress={countDown}
+                  className="mt-5 justify-center bg-blue-300 h-14 w-72 rounded-3xl "
+                >
+                  <Text className="w-72 text-center font-bold text-lg text-white">
+                    Continuar
+                  </Text>
+                </Pressable>
+              )}
+              <View className="mt-5 w-72 h-14 flex-row items-center justify-center">
+                <Text className="items-center text-lg text-gray-500 ">
+                  {data.length} / 20
+                </Text>
+              </View>
+            </>
+          )}
         </View>
       ) : (
         <Text>No se encontró un guante</Text>
