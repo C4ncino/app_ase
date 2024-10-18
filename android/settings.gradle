@@ -44,7 +44,7 @@ if (getRNMinorVersion() >= 75) {
   }
 }
 
-rootProject.name = 'base'
+rootProject.name = 'TR App'
 
 dependencyResolutionManagement {
   versionCatalogs {
