@@ -76,18 +76,21 @@ const Translate = () => {
           </View>
 
           <View className="flex flex-row mt-4">
-            <Pressable
-              className="w-24 h-24 justify-center rounded-full bg-white items-center mr-4"
-              onPress={handlePlayPress}
-            >
-              <Entypo name="controller-play" size={70} color="#35a766" />
-            </Pressable>
-            <Pressable
-              className="w-24 h-24 justify-center rounded-full bg-white items-center"
-              onPress={handleStopPress}
-            >
-              <Entypo name="controller-stop" size={70} color="#d12115" />
-            </Pressable>
+            {!isPlaying ? (
+              <Pressable
+                className="w-24 h-24 justify-center rounded-full bg-white items-center"
+                onPress={handlePlayPress}
+              >
+                <Entypo name="controller-play" size={70} color="#35a766" />
+              </Pressable>
+            ) : (
+              <Pressable
+                className="w-24 h-24 justify-center rounded-full bg-white items-center"
+                onPress={handleStopPress}
+              >
+                <Entypo name="controller-stop" size={70} color="#d12115" />
+              </Pressable>
+            )}
           </View>
         </View>
       ) : (

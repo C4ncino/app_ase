@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import useAPI from "@/hooks/useAPI";
+import { useBleContext } from "@/hooks/useBLEContext";
 
 export const SessionContext = React.createContext<SessionContextModel>({
   login: () => new Promise((resolve) => resolve(false)),
@@ -20,26 +21,46 @@ const SessionContextProvider = ({ children }: Props) => {
   const [token, setToken] = useState<Token>();
   const { get, post } = useAPI();
 
+  const { forget } = useBleContext();
+
   useEffect(() => {
     const getToken = async () => {
       const token = await AsyncStorage.getItem("token");
 
-      if (!token) router.replace("/login");
+      if (!token) {
+        router.replace("/login");
+        return;
+      }
 
       const response = await get("users/me", token ? token : "");
 
       if (!response) logout();
 
-      setUser(response.user);
-
-      // refresh();
+      setSessionData(response.user, token);
     };
 
     getToken();
   }, []);
 
-  const setSessionData = async (user: User, token: Token) => {
-    setUser(user);
+  const convertDateString = (dateStr: string) => {
+    const [datePart, timePart] = dateStr.split(" ");
+
+    const [day, month, year] = datePart.split("-");
+
+    const formattedDateString = `${year}-${month}-${day}T${timePart}`;
+
+    return new Date(formattedDateString);
+  };
+
+  const setSessionData = async (user: UserResponse, token: Token) => {
+    setUser({
+      id: user.id,
+      name: user.name,
+      last_name: user.last_name,
+      email: user.email,
+      bday: new Date(user.bday),
+      creationDate: convertDateString(user.creationDate),
+    });
 
     setToken(token);
 
@@ -73,6 +94,8 @@ const SessionContextProvider = ({ children }: Props) => {
     setToken(undefined);
 
     await AsyncStorage.removeItem("token");
+
+    forget();
 
     router.replace("/login");
   };

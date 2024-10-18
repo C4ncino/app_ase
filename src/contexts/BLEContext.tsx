@@ -166,12 +166,13 @@ const BLEContextProvider = ({ children }: Props) => {
                 return;
               }
 
-              setBatteryLevel(decodeUInt(char.value));
+              const level = decodeUInt(char.value);
+
+              if (level !== batteryLevel) setBatteryLevel(level);
             });
           });
 
           setMessage(bleMessages[5]);
-
           setIsConnected(true);
         });
     } catch (error) {
@@ -179,9 +180,10 @@ const BLEContextProvider = ({ children }: Props) => {
     }
   };
 
-  const forget = async (setMessage: StringSetter) => {
+  const forget = async (setMessage?: StringSetter) => {
+    console.log(data.map((d) => d.map((dd) => decode(dd))));
+
     setMacAddress("");
-    setIsConnected(false);
     setData([]);
     await AsyncStorage.removeItem("mac");
 
@@ -189,7 +191,8 @@ const BLEContextProvider = ({ children }: Props) => {
       manager.cancelDeviceConnection(macAddress);
     }
 
-    setMessage(bleMessages[6]);
+    if (setMessage) setMessage(bleMessages[6]);
+    setIsConnected(false);
   };
 
   const bleContext: BLEContextModel = {

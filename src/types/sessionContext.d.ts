@@ -3,9 +3,9 @@ type Token = string;
 interface User {
   id: number;
   name: string;
-  lastName: string;
+  last_name: string;
   email: string;
-  birthDate: Date;
+  bday: Date;
   creationDate: Date;
 }
 
@@ -20,6 +20,15 @@ interface SignupInfo {
   bday: Date;
   email: string;
   password: string;
+}
+
+interface UserResponse {
+  id: number;
+  name: string;
+  last_name: string;
+  bday: string;
+  creationDate: string;
+  email: string;
 }
 
 interface SessionContextModel {

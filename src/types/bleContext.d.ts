@@ -10,5 +10,5 @@ interface BLEContextModel {
   scan: (setMessage: StringSetter) => void;
   stopScan: () => void;
   connect: (setMessage: StringSetter) => void;
-  forget: (setMessage: StringSetter) => void;
+  forget: (setMessage?: StringSetter) => void;
 }

@@ -1,34 +1,22 @@
 import { useBleContext } from "@/hooks/useBLEContext";
 import { bleMessages } from "@/messages/bleMessages";
 import { useState } from "react";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import {
-  View,
-  Text,
-  Modal,
-  Button,
-  ActivityIndicator,
-  Pressable,
-} from "react-native";
+import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
+import { View, Text, Modal, ActivityIndicator, Pressable } from "react-native";
+import BatteryLevel from "./BatteryLevel";
+import { Feather } from "@expo/vector-icons";
 
 const DeviceLocalizer = () => {
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState("");
 
-  const { scan, stopScan, connect, forget, batteryLevel, isConnected } =
-    useBleContext();
+  const { scan, stopScan, connect, forget, isConnected } = useBleContext();
 
   const onOpen = () => {
     setOpen(true);
     if (!isConnected) {
       scan(setMessage);
     }
-  };
-  const getBatteryColor = (level: number) => {
-    if (level > 60) return "bg-green-400";
-    if (level > 35) return "bg-yellow-400";
-    if (level > 10) return "bg-orange-500";
-    return "bg-red-300";
   };
 
   return (
@@ -43,17 +31,7 @@ const DeviceLocalizer = () => {
             <Text className="text-base text-white font-semibold">Conectar</Text>
           </Pressable>
         ) : (
-          <View className="flex-row items-center ">
-            <Text className="text-sm ">{batteryLevel}%</Text>
-            <MaterialCommunityIcons
-              name="battery-bluetooth-variant"
-              size={20}
-              color="black"
-            />
-            <View
-              className={`w-3 h-3 rounded-full ${getBatteryColor(batteryLevel ?? 0)}`}
-            />
-          </View>
+          <BatteryLevel />
         )}
       </View>
 
@@ -72,9 +50,27 @@ const DeviceLocalizer = () => {
         </View>
 
         <View className="mx-4 my-48 justify-center items-center">
-          <ActivityIndicator className="mb-4" size={72} color="#0088cc" />
+          <View style={{ width: 72, height: 72 }}>
+            {!isConnected ? (
+              <>
+                {message === bleMessages[3] ? (
+                  <ActivityIndicator size={72} color="#0088cc" />
+                ) : message === bleMessages[6] ? (
+                  <Feather name="x-circle" size={72} color="red" />
+                ) : (
+                  <FontAwesome6
+                    name="hand-sparkles"
+                    size={56}
+                    color="#66CCFF"
+                  />
+                )}
+              </>
+            ) : (
+              <FontAwesome6 name="circle-check" size={72} color="green" />
+            )}
+          </View>
 
-          {message && <Text>{message}</Text>}
+          {message && <Text className="mt-4">{message}</Text>}
 
           {message && message === bleMessages[6] ? (
             <Pressable
