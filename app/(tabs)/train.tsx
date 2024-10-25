@@ -64,16 +64,7 @@ const Train = () => {
           </View>
         </View>
 
-        <Pressable
-          onPress={handleSubmit}
-          className="mt-5 justify-center bg-white h-14 w-72 rounded-3xl border-2 border-blue-700"
-        >
-          <Text className="w-72 text-center font-bold text-lg text-blue-800">
-            Iniciar entrenamiento
-          </Text>
-        </Pressable>
-
-        <View className="mt-6 w-72 h-14 bg-white flex-row items-center rounded-3xl px-10 focus:border-2 focus:border-blue-300">
+        <View className="mt-12 w-72 h-14 bg-white flex-row items-center rounded-3xl px-10 focus:border-2 focus:border-blue-300">
           <TextInput
             placeholder="Ingresa la palabra nueva"
             className="items-center text-lg text-center"
@@ -86,6 +77,14 @@ const Train = () => {
             Por favor, ingresa una palabra
           </Text>
         )}
+        <Pressable
+          onPress={handleSubmit}
+          className="mt-5 justify-center bg-white h-14 w-72 rounded-3xl border-2 border-blue-700"
+        >
+          <Text className="w-72 text-center font-bold text-lg text-blue-800">
+            Iniciar entrenamiento
+          </Text>
+        </Pressable>
       </View>
     </ScrollView>
   );
