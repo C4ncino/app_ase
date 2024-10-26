@@ -1,5 +1,6 @@
 import * as FileSystem from "expo-file-system";
 import { Alert } from "react-native";
+import * as tf from "@tensorflow/tfjs";
 
 const useModelsFiles = () => {
   const baseDir = FileSystem.documentDirectory + "models/";
@@ -54,9 +55,27 @@ const useModelsFiles = () => {
     }
   };
 
+  const load = async () => {
+    const filePath = baseDir + "testmodel.json";
+
+    const jsonString = await FileSystem.readAsStringAsync(filePath, {
+      encoding: FileSystem.EncodingType.UTF8,
+    });
+
+    // Convierte la cadena de texto a un objeto JSON
+    const jsonObject = JSON.parse(jsonString);
+
+    console.log(jsonObject);
+
+    const model = await tf.loadLayersModel(filePath);
+
+    console.log(model);
+  };
+
   return {
     saveFile,
     readFile,
+    load,
   };
 };
 
