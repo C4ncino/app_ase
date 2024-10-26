@@ -8,76 +8,18 @@ import {
 } from "react-native";
 import CirculoSvg from "@/svgs/Marcos";
 import { useLocalSearchParams } from "expo-router";
-import { useEffect, useState } from "react";
 import { useBleContext } from "@/hooks/useBLEContext";
-import useAPI from "@/hooks/useAPI";
-import { useSessionContext } from "@/hooks/useSessionContext";
-import { sensor_data } from "@/messages/test";
 import useCountdown from "@/hooks/useCountdown";
+import useTrain from "@/hooks/useTrain";
 
 const Training = () => {
   const { word } = useLocalSearchParams();
 
-  const { counter, isCounting, pause, restart, start } = useCountdown(() =>
+  const { setReceiving, isConnected } = useBleContext();
+  const { counter, isCounting, pause, restart } = useCountdown(() =>
     setReceiving(true)
   );
-
-  const [intervalValidateId, setIntervalValidateId] =
-    useState<NodeJS.Timeout>();
-
-  const [taskId, setTaskId] = useState("");
-
-  const { data, setReceiving, receiving, isConnected, setData } =
-    useBleContext();
-
-  const { token } = useSessionContext();
-  const { post, get } = useAPI();
-
-  const validate = async () => {
-    const response = await post(
-      "train/validate",
-      JSON.stringify({ sensor_data: sensor_data }),
-      token
-    );
-
-    if (response) {
-      setData((d) => d.filter((_, i) => !response.bad_samples.includes(i)));
-      setTaskId(response.task);
-    }
-  };
-
-  useEffect(() => {
-    if (isConnected) start();
-    setData([]);
-  }, [isConnected]);
-
-  useEffect(() => {
-    if (taskId === "") {
-      if (receiving) {
-        setReceiving(false);
-        restart();
-      }
-
-      if (data.length === 20) validate();
-    }
-  }, [data]);
-
-  useEffect(() => {
-    if (taskId) {
-      const intervalId = setInterval(async () => {
-        const response = await get(`train/validate/${taskId}`, token);
-
-        if (response && response.ready) {
-          setData((d) => d.filter((_, i) => !response.bad_samples.includes(i)));
-          console.log(response.bad_samples);
-
-          clearInterval(intervalValidateId);
-        }
-      }, 1000);
-
-      setIntervalValidateId(intervalId);
-    }
-  }, [taskId]);
+  const { validate, samples_size } = useTrain();
 
   return (
     <ScrollView
@@ -86,7 +28,7 @@ const Training = () => {
     >
       {isConnected ? (
         <View className="items-center bg-blue-40 w-full h-full py-6 px-6">
-          {data.length >= 20 ? (
+          {samples_size >= 20 ? (
             <View className="w-full justify-center items-center gap-5">
               <ActivityIndicator />
               <Text>Espera un momento</Text>
@@ -139,7 +81,7 @@ const Training = () => {
               )}
               <View className="mt-5 w-72 h-14 flex-row items-center justify-center">
                 <Text className="items-center text-lg text-gray-500 ">
-                  {data.length} / 20
+                  {samples_size} / 20
                 </Text>
               </View>
             </>
