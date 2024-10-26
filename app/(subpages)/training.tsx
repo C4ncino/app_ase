@@ -13,14 +13,14 @@ import { useBleContext } from "@/hooks/useBLEContext";
 import useAPI from "@/hooks/useAPI";
 import { useSessionContext } from "@/hooks/useSessionContext";
 import { sensor_data } from "@/messages/test";
+import useCountdown from "@/hooks/useCountdown";
 
 const Training = () => {
   const { word } = useLocalSearchParams();
 
-  const [counter, setCounter] = useState(3);
-  const [intervalId, setIntervalId] = useState<NodeJS.Timeout>();
-
-  const [isPlaying, setIsPlaying] = useState(true);
+  const { counter, isCounting, pause, restart, start } = useCountdown(() =>
+    setReceiving(true)
+  );
 
   const [intervalValidateId, setIntervalValidateId] =
     useState<NodeJS.Timeout>();
@@ -32,24 +32,6 @@ const Training = () => {
 
   const { token } = useSessionContext();
   const { post, get } = useAPI();
-
-  const countDown = () => {
-    setIsPlaying(true);
-
-    const inter = setInterval(() => {
-      console.log(inter);
-      setCounter((c) => (c > 0 ? c - 1 : 0));
-    }, 1000);
-
-    setIntervalId(inter);
-  };
-
-  const reset = () => {
-    setReceiving(false);
-    clearInterval(intervalId);
-    setCounter(3);
-    setIsPlaying(false);
-  };
 
   const validate = async () => {
     const response = await post(
@@ -65,35 +47,18 @@ const Training = () => {
   };
 
   useEffect(() => {
-    if (isConnected) countDown();
+    if (isConnected) start();
     setData([]);
   }, [isConnected]);
-
-  useEffect(() => {
-    switch (counter) {
-      case 0:
-        clearInterval(intervalId);
-        break;
-      case 1:
-        setReceiving(true);
-        break;
-      case -1:
-        setCounter(3);
-        countDown();
-        break;
-    }
-  }, [counter]);
 
   useEffect(() => {
     if (taskId === "") {
       if (receiving) {
         setReceiving(false);
-        setCounter(-1);
+        restart();
       }
 
-      if (data.length === 20) {
-        validate();
-      }
+      if (data.length === 20) validate();
     }
   }, [data]);
 
@@ -145,7 +110,7 @@ const Training = () => {
                 </View>
                 <View className="mt-4">
                   <Text className=" font-semibold text-9xl text-blue-800">
-                    {isPlaying ? (
+                    {isCounting ? (
                       <>{counter >= 0 ? counter : 0}</>
                     ) : (
                       <Text>A</Text>
@@ -153,9 +118,9 @@ const Training = () => {
                   </Text>
                 </View>
               </View>
-              {isPlaying ? (
+              {isCounting ? (
                 <Pressable
-                  onPress={reset}
+                  onPress={pause}
                   className="mt-5 justify-center bg-orange-300 h-14 w-72 rounded-3xl "
                 >
                   <Text className="w-72 text-center font-bold text-lg text-white">
@@ -164,7 +129,7 @@ const Training = () => {
                 </Pressable>
               ) : (
                 <Pressable
-                  onPress={countDown}
+                  onPress={restart}
                   className="mt-5 justify-center bg-blue-300 h-14 w-72 rounded-3xl "
                 >
                   <Text className="w-72 text-center font-bold text-lg text-white">
