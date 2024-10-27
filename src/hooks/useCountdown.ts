@@ -1,7 +1,11 @@
 import { useEffect, useState, useCallback } from "react";
 import { useFocusEffect } from "expo-router";
 
-const useCountdown = (callback: () => void, countStart: number = 3) => {
+const useCountdown = (
+  startAction: () => void,
+  stopAction: () => void,
+  countStart: number = 3
+) => {
   const [counter, setCounter] = useState(countStart);
   const [isCounting, setIsCounting] = useState(false);
   const [intervalId, setIntervalId] = useState<NodeJS.Timeout>();
@@ -22,7 +26,7 @@ const useCountdown = (callback: () => void, countStart: number = 3) => {
   );
 
   const pause = () => {
-    callback();
+    stopAction();
     clearInterval(intervalId);
     setCounter(countStart);
     setIsCounting(false);
@@ -43,7 +47,7 @@ const useCountdown = (callback: () => void, countStart: number = 3) => {
         clearInterval(intervalId);
         break;
       case 1:
-        callback();
+        startAction();
         break;
       case -1:
         start();
