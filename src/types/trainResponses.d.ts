@@ -37,6 +37,7 @@ type TrainLargeTaskResponse = {
   success: boolean;
   result: {
     id: number;
+    last_update: string;
     model: ModelData;
   };
 };

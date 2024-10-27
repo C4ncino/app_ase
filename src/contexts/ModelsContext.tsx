@@ -6,14 +6,22 @@ import {
   writeAsStringAsync,
   EncodingType,
 } from "expo-file-system";
+import { loadLayersModel } from "@tensorflow/tfjs";
+import {
+  Model,
+  ModelData,
+  Models,
+  ModelsContextModel,
+} from "@/types/modelsContext";
 
 export const ModelsContext = createContext<ModelsContextModel>({
-  largeModel: undefined,
-  smallModels: {},
+  saveModel: () => Promise.resolve(""),
+
   setLargeModel: () => {},
   addSmallModel: () => {},
-  getSmallModel: () => undefined,
-  saveModel: () => Promise.resolve(),
+
+  getLargeModel: () => Promise.resolve(undefined),
+  getSmallModel: () => Promise.resolve(undefined),
 });
 
 interface Props extends PropsWithChildren {}
@@ -41,7 +49,7 @@ const ModelsContextProvider = ({ children }: Props) => {
   const saveModel = async (
     modelData: ModelData,
     dirName: string
-  ): Promise<void> => {
+  ): Promise<string> => {
     try {
       const path = await createDir(dirName);
 
@@ -60,6 +68,8 @@ const ModelsContextProvider = ({ children }: Props) => {
           encoding: EncodingType.Base64,
         });
       });
+
+      return jsonFilePath;
     } catch (error) {
       console.error("Error codificando JSON a base64: ", error);
       throw error;
@@ -70,15 +80,32 @@ const ModelsContextProvider = ({ children }: Props) => {
     setSmallModels({ ...smallModels, [id]: model });
   };
 
-  const getSmallModel = (id: number) => smallModels[id];
+  const load = async (modelPath: string) => {
+    const model = await loadLayersModel(modelPath);
+
+    return model;
+  };
+
+  const getLargeModel = async () => {
+    if (!largeModel) return undefined;
+
+    return await load(largeModel.model_path);
+  };
+
+  const getSmallModel = async (id: number) => {
+    const modelInfo = smallModels[id];
+
+    if (!modelInfo) return undefined;
+
+    return await load(modelInfo.model_path);
+  };
 
   const modelsContext: ModelsContextModel = {
-    largeModel,
-    smallModels,
+    saveModel,
     setLargeModel,
     addSmallModel,
+    getLargeModel,
     getSmallModel,
-    saveModel,
   };
 
   return (

@@ -6,6 +6,7 @@ import { messages } from "@/messages/train";
 import { useBleContext } from "./useBLEContext";
 import { useSessionContext } from "./useSessionContext";
 import useBase64 from "./useBase64";
+import { useModelsContext } from "./useModelsContext";
 
 const useTrain = (word: string) => {
   const { token, user, refresh } = useSessionContext();
@@ -20,6 +21,7 @@ const useTrain = (word: string) => {
   );
 
   const { decodeGloveData } = useBase64();
+  const { saveModel, addSmallModel, setLargeModel } = useModelsContext();
 
   const [state, setState] = useState(0);
   const [message, setMessage] = useState("");
@@ -114,7 +116,24 @@ const useTrain = (word: string) => {
       const response: TrainTaskResponse = await get(`train/${taskId}`, token);
 
       if (response && response.ready) {
-        // TODO: Add word to models Context
+        const modelResponse = await get(
+          `train/${response.word.id}/model`,
+          token
+        );
+
+        if (modelResponse) {
+          const modelPath = await saveModel(
+            modelResponse.model,
+            `${response.word.class_key}/`
+          );
+          addSmallModel(
+            {
+              meaning: response.word.word,
+              model_path: modelPath,
+            },
+            response.word.id
+          );
+        }
 
         setState(3);
 
@@ -133,7 +152,14 @@ const useTrain = (word: string) => {
       );
 
       if (response && response.ready) {
-        // TODO: add model to context
+        const modelPath = await saveModel(
+          response.result.model,
+          "generalModel/"
+        );
+
+        setLargeModel({
+          model_path: modelPath,
+        });
 
         setState(4);
         clearInterval(intervalId);

@@ -1,3 +1,5 @@
+import { LayersModel } from "@tensorflow/tfjs";
+
 type ModelData = {
   json: {
     [key: string]: any;
@@ -8,7 +10,7 @@ type ModelData = {
 };
 
 type Model = {
-  meaning: string;
+  meaning?: string;
   model_path: string;
 };
 
@@ -19,11 +21,11 @@ interface LargeModel extends Model {
 type Models = Record<int, Model>;
 
 type ModelsContextModel = {
-  largeModel?: Model;
-  smallModels: Models;
+  saveModel: (modelData: ModelData, dirName: string) => Promise<string>;
 
   setLargeModel: React.Dispatch<React.SetStateAction<Model | undefined>>;
   addSmallModel: (model: Model, id: number) => void;
-  getSmallModel: (id: number) => Model | undefined;
-  saveModel: (modelData: ModelData, dirName: string) => Promise<void>;
+
+  getLargeModel: () => Promise<LayersModel | undefined>;
+  getSmallModel: (id: number) => Promise<LayersModel | undefined>;
 };
