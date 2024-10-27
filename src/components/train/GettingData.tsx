@@ -1,5 +1,6 @@
-import { View, Text, Pressable } from "react-native";
+import { View, Text, Pressable, StyleSheet } from "react-native";
 import CirculoSvg from "@/svgs/Marcos";
+import { Ionicons } from "@expo/vector-icons";
 
 interface Props {
   isCounting: boolean;
@@ -21,7 +22,7 @@ const GettingData = ({
       <Text className=" mt-3 font-semibold text-lg text-blue-800">
         El entrenamiento comienza en:
       </Text>
-      <View className="justify-center items-center relative mt-28 mb-28">
+      <View className="justify-center items-center relative my-28 w-screen h-40 pt-2">
         <View
           style={{
             justifyContent: "center",
@@ -34,15 +35,28 @@ const GettingData = ({
           <CirculoSvg width="120%" height="120%" />
         </View>
         <View className="mt-4">
-          <Text className=" font-semibold text-9xl text-blue-800">
-            {isCounting ? <>{counter >= 0 ? counter : 0}</> : <Text>A</Text>}
-          </Text>
+          {isCounting ? (
+            <Text className=" font-semibold text-9xl text-blue-800">
+              {counter >= 0 ? counter : 0}
+            </Text>
+          ) : (
+            <Ionicons
+              name="pause"
+              size={120}
+              color="gray"
+              style={{ top: -12 }}
+            />
+          )}
         </View>
       </View>
       {isCounting ? (
         <Pressable
           onPress={pause}
-          className="mt-5 justify-center bg-orange-300 h-14 w-72 rounded-3xl "
+          style={({ pressed }) => [
+            styles.baseStyle,
+            pressed ? styles.pressedStyle : styles.shadowStyle,
+            { backgroundColor: "#fdba74" },
+          ]}
         >
           <Text className="w-72 text-center font-bold text-lg text-white">
             Pausar
@@ -51,7 +65,11 @@ const GettingData = ({
       ) : (
         <Pressable
           onPress={restart}
-          className="mt-5 justify-center bg-blue-300 h-14 w-72 rounded-3xl "
+          style={({ pressed }) => [
+            styles.baseStyle,
+            pressed ? styles.pressedStyle : styles.shadowStyle,
+            { backgroundColor: "#33bbff" },
+          ]}
         >
           <Text className="w-72 text-center font-bold text-lg text-white">
             Continuar
@@ -66,5 +84,30 @@ const GettingData = ({
     </>
   );
 };
+
+const styles = StyleSheet.create({
+  baseStyle: {
+    justifyContent: "center",
+    height: 58,
+    width: 284,
+    borderRadius: 100,
+    backgroundColor: "#fdba74",
+    marginTop: 26,
+  },
+  shadowStyle: {
+    shadowColor: "black",
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  pressedStyle: {
+    height: 54,
+    shadowColor: "",
+    shadowOpacity: 0,
+    shadowRadius: 0,
+    elevation: 0,
+    marginTop: 30,
+  },
+});
 
 export default GettingData;

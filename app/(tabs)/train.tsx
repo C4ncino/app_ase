@@ -35,8 +35,8 @@ const Train = () => {
         <View className="justify-center items-center relative mb-24">
           <View
             style={{
-              width: 170,
-              height: 170,
+              width: 180,
+              height: 180,
 
               marginTop: 98,
               borderRadius: 100,
@@ -45,7 +45,7 @@ const Train = () => {
               alignItems: "center",
               backgroundColor: "#fff",
             }}
-            className="border-2 border-blue-600 border-opacity-100"
+            className="border-2 border-blue-500 border-opacity-50"
           >
             <TrainSvg width="100%" height="100%" />
           </View>
@@ -64,7 +64,7 @@ const Train = () => {
           </View>
         </View>
 
-        <View className="mt-12 w-72 h-14 bg-white flex-row items-center rounded-3xl px-10 focus:border-2 focus:border-blue-300">
+        <View className="mt-2 w-72 h-14 bg-white flex-row items-center rounded-3xl px-10 focus:border-2 focus:border-blue-300">
           <TextInput
             placeholder="Ingresa la palabra nueva"
             className="items-center text-lg text-center"
@@ -79,7 +79,22 @@ const Train = () => {
         )}
         <Pressable
           onPress={handleSubmit}
-          className="mt-5 justify-center bg-white h-14 w-72 rounded-3xl border-2 border-blue-700"
+          style={({ pressed }) => [
+            {
+              marginTop: pressed ? 26 : 22,
+              justifyContent: "center",
+              height: pressed ? 54 : 58,
+              width: pressed ? 280 : 284,
+              borderRadius: 100,
+              borderColor: "#006699",
+              borderWidth: 2,
+              backgroundColor: "white",
+              shadowColor: pressed ? "" : "black",
+              shadowOpacity: pressed ? 0 : 0.25,
+              shadowRadius: pressed ? 0 : 3.84,
+              elevation: pressed ? 0 : 5,
+            },
+          ]}
         >
           <Text className="w-72 text-center font-bold text-lg text-blue-800">
             Iniciar entrenamiento

@@ -2,6 +2,7 @@ import { View, Text, Pressable, ScrollView } from "react-native";
 import Entypo from "@expo/vector-icons/Entypo";
 import { useState, useEffect } from "react";
 import { useBleContext } from "@/hooks/useBLEContext";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
 const Translate = () => {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -78,15 +79,49 @@ const Translate = () => {
           <View className="flex flex-row mt-4">
             {!isPlaying ? (
               <Pressable
-                className="w-24 h-24 justify-center rounded-full bg-white items-center"
+                // className="w-24 h-24 justify-center rounded-full bg-white items-center"
                 onPress={handlePlayPress}
+                style={({ pressed }) => [
+                  {
+                    marginTop: pressed ? 12 : 8,
+                    justifyContent: "center",
+                    height: pressed ? 81 : 85,
+                    width: pressed ? 81 : 85,
+                    borderRadius: 100,
+                    backgroundColor: "white",
+                    shadowColor: pressed ? "" : "black",
+                    shadowOpacity: pressed ? 0 : 0.25,
+                    shadowRadius: pressed ? 0 : 3.84,
+                    elevation: pressed ? 0 : 5,
+                  },
+                ]}
               >
-                <Entypo name="controller-play" size={70} color="#35a766" />
+                <Entypo
+                  name="controller-play"
+                  size={70}
+                  color="#35a766"
+                  style={{ paddingStart: 9 }}
+                />
               </Pressable>
             ) : (
               <Pressable
-                className="w-24 h-24 justify-center rounded-full bg-white items-center"
+                // className="w-24 h-24 justify-center rounded-full bg-white items-center"
                 onPress={handleStopPress}
+                style={({ pressed }) => [
+                  {
+                    marginTop: pressed ? 12 : 8,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    height: pressed ? 81 : 85,
+                    width: pressed ? 81 : 85,
+                    borderRadius: 100,
+                    backgroundColor: "white",
+                    shadowColor: pressed ? "" : "black",
+                    shadowOpacity: pressed ? 0 : 0.25,
+                    shadowRadius: pressed ? 0 : 3.84,
+                    elevation: pressed ? 0 : 5,
+                  },
+                ]}
               >
                 <Entypo name="controller-stop" size={70} color="#d12115" />
               </Pressable>
@@ -94,7 +129,16 @@ const Translate = () => {
           </View>
         </View>
       ) : (
-        <Text>No se encontró un guante</Text>
+        <View className="justify-center items-center w-full h-full">
+          <MaterialCommunityIcons
+            name="alert-octagon-outline"
+            size={72}
+            color="#f55347"
+          />
+          <Text className="text-lg text-gray-600">
+            No se encontró un guante
+          </Text>
+        </View>
       )}
     </View>
   );

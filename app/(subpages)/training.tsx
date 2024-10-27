@@ -3,6 +3,7 @@ import {
   Text,
   ScrollView,
   Button,
+  StyleSheet,
   ActivityIndicator,
   Pressable,
 } from "react-native";
@@ -10,6 +11,8 @@ import { useLocalSearchParams } from "expo-router";
 import { useBleContext } from "@/hooks/useBLEContext";
 import useTrain from "@/hooks/useTrain";
 import GettingData from "@/components/train/GettingData";
+import { Ionicons } from "@expo/vector-icons";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
 const Training = () => {
   const { word } = useLocalSearchParams();
@@ -46,10 +49,18 @@ const Training = () => {
           )}
         </View>
       ) : (
-        <Text>No se encontró un guante</Text>
+        <View className="justify-center items-center w-full mt-72 mb-4">
+          <MaterialCommunityIcons
+            name="alert-octagon-outline"
+            size={72}
+            color="#f55347"
+          />
+          <Text className="text-lg text-gray-600">
+            No se encontró un guante
+          </Text>
+        </View>
       )}
-
-      <Button title="Validar" onPress={validate} />
+      {/* <Button title="Validar" onPress={validate} /> */}
     </ScrollView>
   );
 };

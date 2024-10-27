@@ -74,8 +74,25 @@ const DeviceLocalizer = () => {
 
           {message && message === bleMessages[6] ? (
             <Pressable
-              className="mt-10 w-48 h-14 rounded-full justify-center items-center border-2 border-blue-600 "
+              // className="mt-10 w-48 h-14 rounded-full justify-center items-center border-2 border-blue-600 "
               onPress={onOpen}
+              style={({ pressed }) => [
+                {
+                  marginTop: pressed ? 25 : 20,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  height: pressed ? 52 : 56,
+                  width: pressed ? 186 : 190,
+                  borderRadius: 100,
+                  borderColor: "#0088cc",
+                  borderWidth: 2,
+                  backgroundColor: "white",
+                  shadowColor: "black",
+                  shadowOpacity: pressed ? 0 : 0.25,
+                  shadowRadius: pressed ? 0 : 3.84,
+                  elevation: pressed ? 0 : 5,
+                },
+              ]}
             >
               <Text className="font-semibold text-base text-blue-600">
                 Buscar Guante
@@ -83,9 +100,32 @@ const DeviceLocalizer = () => {
             </Pressable>
           ) : (
             <Pressable
-              className={`mt-10 w-48 h-14 rounded-full justify-center items-center ${message === bleMessages[0] || isConnected ? "border-2 border-gray-600 " : "border-2 border-blue-600 "}`}
+              // className={`mt-10 w-48 h-14 rounded-full justify-center items-center ${message === bleMessages[0] || isConnected ? "border-2 border-gray-600 " : "border-2 border-blue-600 "}`}
               onPress={() => connect(setMessage)}
               disabled={message === bleMessages[0]}
+              style={({ pressed }) => [
+                {
+                  marginTop: pressed ? 25 : 20,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  height: pressed ? 52 : 56,
+                  width: pressed ? 186 : 190,
+                  borderRadius: 100,
+                  borderColor:
+                    message === bleMessages[0] || isConnected
+                      ? "#6c8693"
+                      : "#0088cc",
+                  borderWidth: 2,
+                  backgroundColor: "white",
+                  shadowColor:
+                    message === bleMessages[0] || isConnected || pressed
+                      ? "white"
+                      : "black",
+                  shadowOpacity: pressed ? 0 : 0.25,
+                  shadowRadius: pressed ? 0 : 3.84,
+                  elevation: pressed ? 0 : 5,
+                },
+              ]}
             >
               <Text
                 className={`font-semibold text-base ${message === bleMessages[0] || isConnected ? "text-gray-600" : "text-blue-600"}`}
@@ -95,9 +135,26 @@ const DeviceLocalizer = () => {
             </Pressable>
           )}
           <Pressable
-            className={`mt-4 w-48 h-14 rounded-full justify-center items-center ${!isConnected ? "border-2 border-gray-600 " : "border-2 border-red-400 "}`}
+            // className={`mt-4 w-48 h-14 rounded-full justify-center items-center ${!isConnected ? "border-2 border-gray-600 " : "border-2 border-red-400 "}`}
             onPress={() => forget(setMessage)}
             disabled={!isConnected}
+            style={({ pressed }) => [
+              {
+                marginTop: pressed ? 25 : 20,
+                justifyContent: "center",
+                alignItems: "center",
+                height: pressed ? 52 : 56,
+                width: pressed ? 186 : 190,
+                borderRadius: 100,
+                borderColor: !isConnected ? "#6c8693" : "#d12115",
+                borderWidth: 2,
+                backgroundColor: "white",
+                shadowColor: !isConnected || pressed ? "white" : "black",
+                shadowOpacity: pressed ? 0 : 0.25,
+                shadowRadius: pressed ? 0 : 3.84,
+                elevation: pressed ? 0 : 5,
+              },
+            ]}
           >
             <Text
               className={`font-semibold text-base ${!isConnected ? "text-gray-600" : "text-red-400"}`}

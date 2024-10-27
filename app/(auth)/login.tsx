@@ -9,18 +9,6 @@ import { errors } from "@/messages/loginMessages";
 import { emailRegex } from "@/utils/regex";
 
 const styles = StyleSheet.create({
-  LoginButt: {
-    backgroundColor: "#0088cc",
-    borderRadius: 100,
-    marginTop: 20,
-    height: 50,
-  },
-  textlog: {
-    textAlign: "center",
-    padding: 10,
-    fontStyle: "normal",
-    color: "#FFFFFF",
-  },
   inputContainer: {
     flexDirection: "row",
   },
@@ -117,12 +105,31 @@ export default function Component() {
         {error && (
           <Text className="text-red-500 text-center mt-2">{error}</Text>
         )}
-
-        <Pressable style={styles.LoginButt} onPress={handleLogin}>
-          <Text style={styles.textlog} className="font-bold text-lg">
-            Iniciar sesión
-          </Text>
-        </Pressable>
+        <View className="justify-center items-center">
+          <Pressable
+            onPress={handleLogin}
+            style={({ pressed }) => [
+              {
+                marginTop: pressed ? 30 : 26,
+                justifyContent: "center",
+                height: pressed ? 56 : 60,
+                width: pressed ? 282 : 286,
+                borderRadius: 100,
+                borderColor: "#006699",
+                borderWidth: 2,
+                backgroundColor: "white",
+                shadowColor: pressed ? "" : "black",
+                shadowOpacity: pressed ? 0 : 0.25,
+                shadowRadius: pressed ? 0 : 3.84,
+                elevation: pressed ? 0 : 5,
+              },
+            ]}
+          >
+            <View className="items-center">
+              <Text className="font-bold text-lg">Iniciar sesión</Text>
+            </View>
+          </Pressable>
+        </View>
 
         <View className="flex-row justify-center mt-4">
           <Text className="text-sm  text-gray-600 mr-1">
