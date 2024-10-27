@@ -25,4 +25,5 @@ type ModelsContextModel = {
   setLargeModel: React.Dispatch<React.SetStateAction<Model | undefined>>;
   addSmallModel: (model: Model, id: number) => void;
   getSmallModel: (id: number) => Model | undefined;
+  saveModel: (modelData: ModelData, dirName: string) => Promise<void>;
 };
