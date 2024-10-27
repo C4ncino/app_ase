@@ -74,7 +74,7 @@ const SignUp = () => {
   };
 
   return (
-    <SafeAreaView className="justify-start items-start w-full h-full">
+    <SafeAreaView className="justify-center items-center w-full h-full">
       <SignUpSvg
         width="75%"
         height="25%"
@@ -173,12 +173,31 @@ const SignUp = () => {
         {error && (
           <Text className="text-red-500 text-center mt-2">{error}</Text>
         )}
-
-        <Pressable style={styles.LoginButt} onPress={onSubmit}>
-          <Text style={styles.textlog} className="font-bold text-lg">
-            Regístrate
-          </Text>
-        </Pressable>
+        <View className="items-center">
+          <Pressable
+            onPress={onSubmit}
+            style={({ pressed }) => [
+              {
+                marginTop: pressed ? 30 : 26,
+                justifyContent: "center",
+                height: pressed ? 56 : 60,
+                width: pressed ? 282 : 286,
+                borderRadius: 100,
+                borderColor: "#006699",
+                borderWidth: 2,
+                backgroundColor: "white",
+                shadowColor: pressed ? "" : "black",
+                shadowOpacity: pressed ? 0 : 0.25,
+                shadowRadius: pressed ? 0 : 3.84,
+                elevation: pressed ? 0 : 5,
+              },
+            ]}
+          >
+            <View className="items-center">
+              <Text className="font-bold text-lg">Regístrate</Text>
+            </View>
+          </Pressable>
+        </View>
 
         <View className="flex-row justify-center mt-2">
           <Text className="text-sm  text-gray-600 mr-1">

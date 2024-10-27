@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { SectionList, View, Text } from "react-native";
+import { SectionList, View, Text, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import TitleHeader from "@/components/Vocabulary/TitleHeader";
 import WordListItem from "@/components/Vocabulary/WordListItem";
@@ -8,6 +8,9 @@ import { Link, router, useFocusEffect } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import useAPI from "@/hooks/useAPI";
 import { useSessionContext } from "@/hooks/useSessionContext";
+import Octicons from "@expo/vector-icons/Octicons";
+import Popover from "react-native-popover-view";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
 const Vocabulary = () => {
   const [wordsLists, setWordsLists] = useState<WordList[]>([]);
@@ -46,26 +49,54 @@ const Vocabulary = () => {
         <Text className="text-lg text-center font-semibold text-blue-600 flex-1">
           Vocabulario
         </Text>
+        <View className="right-4">
+          <Popover
+            from={
+              <Pressable>
+                <Octicons name="info" size={24} color="#6C8693" />
+              </Pressable>
+            }
+            popoverStyle={{
+              width: 360,
 
-        <View className="border-2 border-green-500 rounded-full flex items-baseline absolute right-4">
+              paddingHorizontal: 12,
+              paddingVertical: 12,
+              alignItems: "center",
+              borderRadius: 20,
+            }}
+          >
+            <Text className="text-base text-justify ">
+              Aquí podras ver todas las palabras que has entrenado, si gustas
+              agregar más palabras ve a la pantalla de entrenamiento.
+            </Text>
+          </Popover>
+        </View>
+
+        {/* <View className="border-2 border-green-500 rounded-full flex items-baseline absolute right-4">
           <Link href="/train">
             <Feather name="plus" size={24} color="green" />
           </Link>
-        </View>
+        </View> */}
       </View>
-      {wordsLists.length === 0 ? (
-        <Text>No hay palabras aún...</Text>
-      ) : (
-        <SectionList
-          className="mx-4 px-2 bg-white rounded-3xl h-[91%]"
-          keyExtractor={(item, _) => item.id.toString()}
-          sections={wordsLists}
-          renderItem={({ item }) => <WordListItem word={item} />}
-          renderSectionHeader={({ section: { title } }) => (
-            <TitleHeader title={title} />
-          )}
-        />
-      )}
+      <SectionList
+        className="mx-4 px-2 bg-white rounded-3xl h-[91%]"
+        keyExtractor={(item, _) => item.id.toString()}
+        sections={wordsLists}
+        renderItem={({ item }) => <WordListItem word={item} />}
+        renderSectionHeader={({ section: { title } }) => (
+          <TitleHeader title={title} />
+        )}
+        ListEmptyComponent={
+          <View className="w-full h-full items-center justify-center py-56">
+            <MaterialCommunityIcons
+              name="clipboard-text-off-outline"
+              size={65}
+              color="#f55347"
+            />
+            <Text className="text-base">No hay palabras aún...</Text>
+          </View>
+        }
+      />
     </SafeAreaView>
   );
 };

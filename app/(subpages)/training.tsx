@@ -4,6 +4,7 @@ import {
   Pressable,
   ScrollView,
   Button,
+  StyleSheet,
   ActivityIndicator,
 } from "react-native";
 import CirculoSvg from "@/svgs/Marcos";
@@ -13,6 +14,8 @@ import { useBleContext } from "@/hooks/useBLEContext";
 import useAPI from "@/hooks/useAPI";
 import { useSessionContext } from "@/hooks/useSessionContext";
 import { sensor_data } from "@/messages/test";
+import { Ionicons } from "@expo/vector-icons";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
 const Training = () => {
   const { word } = useLocalSearchParams();
@@ -128,10 +131,11 @@ const Training = () => {
             </View>
           ) : (
             <>
-              <Text className=" mt-3 font-semibold text-lg text-blue-800">
+              <Text className="mt-6 font-semibold text-lg text-blue-800">
                 El entrenamiento comienza en:
               </Text>
-              <View className="justify-center items-center relative mt-28 mb-28">
+
+              <View className="justify-center items-center relative my-28 w-screen h-40 pt-2">
                 <View
                   style={{
                     justifyContent: "center",
@@ -143,20 +147,39 @@ const Training = () => {
                 >
                   <CirculoSvg width="120%" height="120%" />
                 </View>
-                <View className="mt-4">
-                  <Text className=" font-semibold text-9xl text-blue-800">
-                    {isPlaying ? (
-                      <>{counter >= 0 ? counter : 0}</>
-                    ) : (
-                      <Text>A</Text>
-                    )}
-                  </Text>
+                <View className="mt-4 relative jutify-center items-center">
+                  {isPlaying ? (
+                    <Text className="font-semibold text-9xl text-blue-800 text-center">
+                      {counter >= 0 ? counter : 0}
+                    </Text>
+                  ) : (
+                    <Ionicons
+                      name="pause"
+                      size={120}
+                      color="gray"
+                      style={{ top: -12 }}
+                    />
+                  )}
                 </View>
               </View>
               {isPlaying ? (
                 <Pressable
                   onPress={reset}
-                  className="mt-5 justify-center bg-orange-300 h-14 w-72 rounded-3xl "
+                  // className="mt-5 justify-center bg-orange-300 h-14 w-72 rounded-3xl "
+                  style={({ pressed }) => [
+                    {
+                      marginTop: pressed ? 30 : 26,
+                      justifyContent: "center",
+                      height: pressed ? 54 : 58,
+                      width: pressed ? 284 : 284,
+                      borderRadius: 100,
+                      backgroundColor: "#fdba74",
+                      shadowColor: pressed ? "" : "black",
+                      shadowOpacity: pressed ? 0 : 0.25,
+                      shadowRadius: pressed ? 0 : 3.84,
+                      elevation: pressed ? 0 : 5,
+                    },
+                  ]}
                 >
                   <Text className="w-72 text-center font-bold text-lg text-white">
                     Pausar
@@ -165,7 +188,21 @@ const Training = () => {
               ) : (
                 <Pressable
                   onPress={countDown}
-                  className="mt-5 justify-center bg-blue-300 h-14 w-72 rounded-3xl "
+                  // className="mt-5 justify-center bg-blue-300 h-14 w-72 rounded-3xl "
+                  style={({ pressed }) => [
+                    {
+                      marginTop: pressed ? 30 : 26,
+                      justifyContent: "center",
+                      height: pressed ? 54 : 58,
+                      width: pressed ? 280 : 284,
+                      borderRadius: 100,
+                      backgroundColor: "#33bbff",
+                      shadowColor: pressed ? "" : "black",
+                      shadowOpacity: pressed ? 0 : 0.25,
+                      shadowRadius: pressed ? 0 : 3.84,
+                      elevation: pressed ? 0 : 5,
+                    },
+                  ]}
                 >
                   <Text className="w-72 text-center font-bold text-lg text-white">
                     Continuar
@@ -181,10 +218,18 @@ const Training = () => {
           )}
         </View>
       ) : (
-        <Text>No se encontró un guante</Text>
+        <View className="justify-center items-center w-full mt-72 mb-4">
+          <MaterialCommunityIcons
+            name="alert-octagon-outline"
+            size={72}
+            color="#f55347"
+          />
+          <Text className="text-lg text-gray-600">
+            No se encontró un guante
+          </Text>
+        </View>
       )}
-
-      <Button title="Validar" onPress={validate} />
+      {/* <Button title="Validar" onPress={validate} /> */}
     </ScrollView>
   );
 };
