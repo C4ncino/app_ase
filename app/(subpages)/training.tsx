@@ -2,24 +2,29 @@ import {
   View,
   Text,
   ScrollView,
-  Button,
-  StyleSheet,
   ActivityIndicator,
   Pressable,
 } from "react-native";
-import { useLocalSearchParams } from "expo-router";
+import { useFocusEffect, useLocalSearchParams } from "expo-router";
 import { useBleContext } from "@/hooks/useBLEContext";
 import useTrain from "@/hooks/useTrain";
 import GettingData from "@/components/train/GettingData";
-import { Ionicons } from "@expo/vector-icons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { useCallback } from "react";
 
 const Training = () => {
   const { word } = useLocalSearchParams();
 
-  const { isConnected } = useBleContext();
-  const { validate, samples, message, state, goBackToGetData, countDown } =
-    useTrain(word as string);
+  const { isConnected, setReceiving } = useBleContext();
+  const { samples, message, state, goBackToGetData, countDown } = useTrain(
+    word as string
+  );
+
+  useFocusEffect(
+    useCallback(() => {
+      return () => setReceiving(false);
+    }, [setReceiving])
+  );
 
   return (
     <ScrollView
@@ -60,7 +65,6 @@ const Training = () => {
           </Text>
         </View>
       )}
-      {/* <Button title="Validar" onPress={validate} /> */}
     </ScrollView>
   );
 };

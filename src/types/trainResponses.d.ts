@@ -31,3 +31,12 @@ type TrainTaskResponse = {
   train_large_task: string;
   word: Word;
 };
+
+type TrainLargeTaskResponse = {
+  ready: boolean;
+  success: boolean;
+  result: {
+    id: number;
+    model: ModelData;
+  };
+};

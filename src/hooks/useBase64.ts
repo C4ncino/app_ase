@@ -14,10 +14,34 @@ const useBase64 = () => {
     return buffer.toString("base64");
   };
 
+  const decodeGloveData = (data: string[][]): TrainingData => {
+    return data.map((str_movement) => {
+      return str_movement.map((str_frame) => {
+        const decode_str = decode(str_frame);
+
+        const split = decode_str.split(" ");
+
+        const frame: Frame = {
+          thumb: Number(decode_str[0]),
+          index: Number(decode_str[1]),
+          middle: Number(decode_str[2]),
+          ring: Number(decode_str[3]),
+          pinky: Number(decode_str[4]),
+          x: Number(split[1]) / 100,
+          y: Number(split[2]) / 100,
+          z: Number(split[3]) / 100,
+        };
+
+        return frame;
+      });
+    });
+  };
+
   return {
     decode,
     decodeUInt,
     encodeBool,
+    decodeGloveData,
   };
 };
 

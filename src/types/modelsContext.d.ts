@@ -1,7 +1,20 @@
+type ModelData = {
+  json: {
+    [key: string]: any;
+  };
+  weights: {
+    [key: string]: string;
+  };
+};
+
 type Model = {
   meaning: string;
   model_path: string;
 };
+
+interface LargeModel extends Model {
+  last_update: string;
+}
 
 type Models = Record<int, Model>;
 

@@ -165,9 +165,9 @@ const BLEContextProvider = ({ children }: Props) => {
                 return;
               }
 
-              const level = decodeUInt(char.value);
+              // const level = decodeUInt(char.value);
 
-              if (level !== batteryLevel) setBatteryLevel(level);
+              // if (level !== batteryLevel) setBatteryLevel(level);
             });
           });
 

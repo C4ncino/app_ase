@@ -37,7 +37,7 @@ const useCountdown = (
   };
 
   const start = () => {
-    setCounter(3);
+    setCounter(countStart);
     countDown();
   };
 

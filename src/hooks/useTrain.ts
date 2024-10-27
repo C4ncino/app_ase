@@ -3,9 +3,9 @@ import { useEffect, useState } from "react";
 import useAPI from "./useAPI";
 import useCountdown from "./useCountdown";
 import { messages } from "@/messages/train";
-import { sensor_data } from "@/messages/test";
 import { useBleContext } from "./useBLEContext";
 import { useSessionContext } from "./useSessionContext";
+import useBase64 from "./useBase64";
 
 const useTrain = (word: string) => {
   const { token, user, refresh } = useSessionContext();
@@ -19,11 +19,11 @@ const useTrain = (word: string) => {
     () => setReceiving(false)
   );
 
+  const { decodeGloveData } = useBase64();
+
   const [state, setState] = useState(0);
   const [message, setMessage] = useState("");
   const [taskId, setTaskId] = useState("");
-
-  const [chars, setChars] = useState<Characteristics>();
 
   useEffect(() => {
     if (isConnected) start();
@@ -36,8 +36,9 @@ const useTrain = (word: string) => {
 
   useEffect(() => {
     if (taskId === "") {
-      if (receiving) {
-        setReceiving(false);
+      setReceiving(false);
+
+      if (state === 0 && receiving) {
         restart();
       }
 
@@ -54,15 +55,17 @@ const useTrain = (word: string) => {
   };
 
   const validate = async () => {
-    const response = await post(
+    const response: ValidateResponse = await post(
       "train/validate",
-      JSON.stringify({ sensor_data: sensor_data }),
+      JSON.stringify({ sensor_data: decodeGloveData(data) }),
       token
     );
 
     if (response) {
-      setData((d) => d.filter((_, i) => !response.bad_samples.includes(i)));
-      setTaskId(response.task);
+      setData((d) => d.filter((_, i) => !response.samples.includes(i)));
+
+      if (response.success) setTaskId(response.task);
+      else setState(6);
     }
   };
 
@@ -76,14 +79,13 @@ const useTrain = (word: string) => {
       if (response && response.ready) {
         const bad_samples = response.result.bad_samples;
 
+        setData((d) => d.filter((_, i) => !bad_samples.includes(i)));
+
         if (data.length - bad_samples.length < 15) {
           setState(6);
           clearInterval(intervalId);
-
           return;
         }
-
-        setData((d) => d.filter((_, i) => !bad_samples.includes(i)));
 
         const trainResponse: TrainResponse = await post(
           "train",
@@ -95,11 +97,12 @@ const useTrain = (word: string) => {
               radius: response.result.radius,
               threshold: response.result.threshold,
             },
-            sensor_data: sensor_data,
+            sensor_data: decodeGloveData(data),
           }),
           token
         );
 
+        setState(2);
         setTaskId(trainResponse.task);
         clearInterval(intervalId);
       }
@@ -111,8 +114,28 @@ const useTrain = (word: string) => {
       const response: TrainTaskResponse = await get(`train/${taskId}`, token);
 
       if (response && response.ready) {
+        // TODO: Add word to models Context
+
+        setState(3);
+
         setTaskId(response.train_large_task);
 
+        clearInterval(intervalId);
+      }
+    }, 1000);
+  };
+
+  const checkLargeModel = () => {
+    const intervalId = setInterval(async () => {
+      const response: TrainLargeTaskResponse = await get(
+        `train/large-model/${taskId}`,
+        token
+      );
+
+      if (response && response.ready) {
+        // TODO: add model to context
+
+        setState(4);
         clearInterval(intervalId);
       }
     }, 1000);
@@ -121,12 +144,19 @@ const useTrain = (word: string) => {
   useEffect(() => {
     if (taskId === "") return;
 
-    if (state === 0) checkValidate();
-    else if (state === 1) checkTraining();
+    if (state === 1) checkValidate();
+    else if (state === 2) checkTraining();
+    else if (state === 3) checkLargeModel();
+    else if (state === 4) {
+      const intervalId = setInterval(async () => {
+        await refresh();
+        setState(5);
+        clearInterval(intervalId);
+      }, 1000);
+    }
   }, [taskId]);
 
   return {
-    validate,
     samples: data.length,
     state,
     message,
