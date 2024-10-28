@@ -23,8 +23,11 @@ const useCountdown = (
 
   useFocusEffect(
     useCallback(() => {
-      return () => clearInterval(intervalId);
-    }, [intervalId])
+      return () => {
+        clearInterval(intervalId);
+        stopAction();
+      };
+    }, [intervalId, stopAction])
   );
 
   const pause = () => {
