@@ -3,64 +3,25 @@ import Entypo from "@expo/vector-icons/Entypo";
 import { useState, useEffect } from "react";
 import { useBleContext } from "@/hooks/useBLEContext";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import useCountdown from "@/hooks/useCountdown";
 
 const Translate = () => {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [counter, setCounter] = useState(3);
-  const [intervalId, setIntervalId] = useState<NodeJS.Timeout>();
-  const { data, setReceiving, receiving, isConnected } = useBleContext();
-
-  const countDown = () => {
-    const inter = setInterval(() => {
-      setCounter((c) => (c > 0 ? c - 1 : 0)); //{
-    }, 1000);
-    setIntervalId(inter);
-  };
+  const { isConnected, setReceiving, setData, data } = useBleContext();
+  const { start, pause, counter, isCounting } = useCountdown(
+    () => setReceiving(true),
+    () => setReceiving(false)
+  );
 
   useEffect(() => {
-    switch (counter) {
-      case 0:
-        clearInterval(intervalId);
-        setIsPlaying(false);
-        break;
-      case 1:
-        setReceiving(true);
-        break;
-      case -1:
-        countDown();
-        setCounter(3);
-        break;
-
-      default:
-        break;
-    }
-  }, [counter]);
+    setData([]);
+  }, []);
 
   useEffect(() => {
-    return () => {
-      if (intervalId) clearInterval(intervalId);
-    };
-  }, [intervalId]);
-
-  useEffect(() => {
-    console.log("Total de datos: ", data.length);
-    data.forEach((d) => {
-      console.log(d.length);
-    });
+    // console.log("Total de datos: ", data.length);
+    // data.forEach((d) => {
+    //   console.log(d.length);
+    // });
   }, [data]);
-
-  const handlePlayPress = () => {
-    setIsPlaying(true);
-    countDown();
-  };
-
-  const handleStopPress = () => {
-    console.log("stop");
-    setReceiving(false);
-    clearInterval(intervalId!);
-    setCounter(3);
-    setIsPlaying(false);
-  };
 
   return (
     <View className="w-full h-full items-center bg-blue-40 py-16 px-0">
@@ -71,16 +32,16 @@ const Translate = () => {
             <View className="flex-1 px-4 mt-2">
               <Text className="text-justify text-lg"> </Text>
             </View>
-            {isPlaying && counter > 0 && (
+            {isCounting && counter > 0 && (
               <Text className="text-6xl  text-gray-600 ">{counter}</Text>
             )}
           </View>
 
           <View className="flex flex-row mt-4">
-            {!isPlaying ? (
+            {!isCounting ? (
               <Pressable
                 // className="w-24 h-24 justify-center rounded-full bg-white items-center"
-                onPress={handlePlayPress}
+                onPress={start}
                 style={({ pressed }) => [
                   {
                     marginTop: pressed ? 12 : 8,
@@ -106,7 +67,7 @@ const Translate = () => {
             ) : (
               <Pressable
                 // className="w-24 h-24 justify-center rounded-full bg-white items-center"
-                onPress={handleStopPress}
+                onPress={pause}
                 style={({ pressed }) => [
                   {
                     marginTop: pressed ? 12 : 8,
