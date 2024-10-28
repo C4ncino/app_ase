@@ -9,6 +9,8 @@ import useBase64 from "./useBase64";
 import { useModelsContext } from "./useModelsContext";
 
 const useTrain = (word: string) => {
+  const MAX_SAMPLES = 20;
+
   const { token, user, refresh } = useSessionContext();
   const { post, get } = useAPI();
 
@@ -28,26 +30,26 @@ const useTrain = (word: string) => {
   const [taskId, setTaskId] = useState("");
 
   useEffect(() => {
+    console.log("useEffect de Conectado");
+
     if (isConnected) start();
     setData([]);
   }, [isConnected]);
 
   useEffect(() => {
+    console.log("useEffect de state");
     setMessage(messages[state]);
   }, [state]);
 
   useEffect(() => {
+    console.log("useEffect de data");
     if (taskId === "") {
       setReceiving(false);
 
-      if (state === 0 && receiving) {
-        restart();
-      }
-
-      if (data.length === 20) {
+      if (data.length === MAX_SAMPLES) {
         setState(1);
         validate();
-      }
+      } else if (receiving) restart();
     }
   }, [data]);
 
@@ -57,6 +59,8 @@ const useTrain = (word: string) => {
   };
 
   const validate = async () => {
+    setReceiving(false);
+
     const response: ValidateResponse = await post(
       "train/validate",
       JSON.stringify({ sensor_data: decodeGloveData(data) }),
@@ -108,7 +112,7 @@ const useTrain = (word: string) => {
         setTaskId(trainResponse.task);
         clearInterval(intervalId);
       }
-    }, 1000);
+    }, 2000);
   };
 
   const checkTraining = () => {
@@ -141,7 +145,7 @@ const useTrain = (word: string) => {
 
         clearInterval(intervalId);
       }
-    }, 1000);
+    }, 5000);
   };
 
   const checkLargeModel = () => {
@@ -164,25 +168,36 @@ const useTrain = (word: string) => {
         setState(4);
         clearInterval(intervalId);
       }
-    }, 1000);
+    }, 5000);
   };
 
   useEffect(() => {
+    console.log("useEffect de taskId");
     if (taskId === "") return;
+    switch (state) {
+      case 1:
+        checkValidate();
+        break;
 
-    if (state === 1) checkValidate();
-    else if (state === 2) checkTraining();
-    else if (state === 3) checkLargeModel();
-    else if (state === 4) {
-      const intervalId = setInterval(async () => {
-        await refresh();
-        setState(5);
-        clearInterval(intervalId);
-      }, 1000);
+      case 2:
+        checkTraining();
+        break;
+
+      case 3:
+        checkLargeModel();
+        break;
+
+      case 4:
+        const intervalId = setInterval(async () => {
+          await refresh();
+          setState(5);
+          clearInterval(intervalId);
+        }, 1000);
     }
   }, [taskId]);
 
   return {
+    MAX_SAMPLES,
     samples: data.length,
     state,
     message,

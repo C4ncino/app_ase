@@ -16,9 +16,8 @@ const Training = () => {
   const { word } = useLocalSearchParams();
 
   const { isConnected, setReceiving } = useBleContext();
-  const { samples, message, state, goBackToGetData, countDown } = useTrain(
-    word as string
-  );
+  const { samples, message, state, goBackToGetData, countDown, MAX_SAMPLES } =
+    useTrain(word as string);
 
   useFocusEffect(
     useCallback(() => {
@@ -45,6 +44,7 @@ const Training = () => {
             </View>
           ) : (
             <GettingData
+              maxSamples={MAX_SAMPLES}
               isCounting={countDown.isCounting}
               counter={countDown.counter}
               pause={countDown.pause}

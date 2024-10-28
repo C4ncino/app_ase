@@ -12,9 +12,11 @@ const useCountdown = (
 
   const countDown = () => {
     setIsCounting(true);
-    const inter = setInterval(() => {
-      setCounter((c) => (c > 0 ? c - 1 : 0));
-    }, 1000);
+
+    const inter = setInterval(
+      () => setCounter((c) => (c > 0 ? c - 1 : 0)),
+      1000
+    );
 
     setIntervalId(inter);
   };

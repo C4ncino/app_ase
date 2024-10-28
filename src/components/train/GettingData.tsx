@@ -3,6 +3,7 @@ import CirculoSvg from "@/svgs/Marcos";
 import { Ionicons } from "@expo/vector-icons";
 
 interface Props {
+  maxSamples: number;
   isCounting: boolean;
   counter: number;
   pause: () => void;
@@ -11,6 +12,7 @@ interface Props {
 }
 
 const GettingData = ({
+  maxSamples,
   isCounting,
   counter,
   pause,
@@ -78,7 +80,7 @@ const GettingData = ({
       )}
       <View className="mt-5 w-72 h-14 flex-row items-center justify-center">
         <Text className="items-center text-lg text-gray-500 ">
-          {samples} / 20
+          {samples} / {maxSamples}
         </Text>
       </View>
     </>
