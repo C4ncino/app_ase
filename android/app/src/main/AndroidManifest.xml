@@ -35,7 +35,7 @@
         <category android:name="android.intent.category.BROWSABLE"/>
         <data android:scheme="yourScheme"/>
         <data android:scheme="com.tr.ibero"/>
-        <data android:scheme="exp+trapp"/>
+        <data android:scheme="exp+tr-app"/>
       </intent-filter>
     </activity>
     <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" android:exported="false"/>
