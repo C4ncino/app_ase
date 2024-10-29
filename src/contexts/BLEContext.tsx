@@ -133,9 +133,8 @@ const BLEContextProvider = ({ children }: Props) => {
                 setTimeout(() => {
                   console.log("🚀 ~ tempData:", tempData.length);
 
-                  if (tempData.length >= 55) {
-                    setData((d) => [...d, tempData]);
-                  }
+                  if (tempData.length >= 55) setData((d) => [...d, tempData]);
+
                   tempData = [];
                 }, 1000);
               }
@@ -166,9 +165,9 @@ const BLEContextProvider = ({ children }: Props) => {
                 return;
               }
 
-              const level = decodeUInt(char.value);
+              // const level = decodeUInt(char.value);
 
-              if (level !== batteryLevel) setBatteryLevel(level);
+              // if (level !== batteryLevel) setBatteryLevel(level);
             });
           });
 
@@ -187,9 +186,7 @@ const BLEContextProvider = ({ children }: Props) => {
     setData([]);
     await AsyncStorage.removeItem("mac");
 
-    if (isConnected) {
-      manager.cancelDeviceConnection(macAddress);
-    }
+    if (isConnected) manager.cancelDeviceConnection(macAddress);
 
     if (setMessage) setMessage(bleMessages[6]);
     setIsConnected(false);
