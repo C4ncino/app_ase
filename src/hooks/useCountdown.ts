@@ -27,7 +27,7 @@ const useCountdown = (
         clearInterval(intervalId);
         stopAction();
       };
-    }, [intervalId, stopAction])
+    }, [intervalId])
   );
 
   const pause = () => {

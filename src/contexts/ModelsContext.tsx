@@ -5,9 +5,11 @@ import {
   getInfoAsync,
   writeAsStringAsync,
   EncodingType,
+  readDirectoryAsync,
 } from "expo-file-system";
 import { loadLayersModel } from "@tensorflow/tfjs";
 import {
+  LargeModel,
   Model,
   ModelData,
   Models,
@@ -27,12 +29,32 @@ export const ModelsContext = createContext<ModelsContextModel>({
 interface Props extends PropsWithChildren {}
 
 const ModelsContextProvider = ({ children }: Props) => {
-  const [largeModel, setLargeModel] = useState<Model>();
+  const [largeModel, setLargeModel] = useState<LargeModel>();
   const [smallModels, setSmallModels] = useState<Models>({});
   const baseDir = documentDirectory + "models/";
 
+  async function logAllFilesInDirectory(directoryUri: string) {
+    try {
+      const files = await readDirectoryAsync(directoryUri);
+
+      for (const file of files) {
+        const fileUri = `${directoryUri}/${file}`;
+        const fileInfo = await getInfoAsync(fileUri);
+
+        if (fileInfo.isDirectory) {
+          await logAllFilesInDirectory(fileUri);
+        } else {
+          console.log("File:", fileUri);
+        }
+      }
+    } catch (error) {
+      console.error("Error reading directory:", error);
+    }
+  }
+
   useEffect(() => {
-    createDir("models/");
+    logAllFilesInDirectory(baseDir);
+    createDir("models");
   }, []);
 
   const createDir = async (dirName: string) => {
@@ -43,7 +65,7 @@ const ModelsContextProvider = ({ children }: Props) => {
         intermediates: true,
       });
 
-    return baseDir + dirName;
+    return baseDir + dirName + "/";
   };
 
   const saveModel = async (
@@ -62,7 +84,7 @@ const ModelsContextProvider = ({ children }: Props) => {
       });
 
       Object.entries(modelData.weights).map(async ([key, value]) => {
-        const filePath = path + key + ".bin";
+        const filePath = path + key;
 
         await writeAsStringAsync(filePath, value, {
           encoding: EncodingType.Base64,

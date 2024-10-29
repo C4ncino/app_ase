@@ -3,23 +3,31 @@ import TrainSvg from "@/svgs/Train";
 import CirculoSvg from "@/svgs/Marcos";
 import { router } from "expo-router";
 import { useState } from "react";
+import useAPI from "@/hooks/useAPI";
+import { useSessionContext } from "@/hooks/useSessionContext";
 
 const Train = () => {
-  const [word, stword] = useState("");
-  const [error, seterror] = useState(false);
+  const [word, setWord] = useState("");
+  const [error, setError] = useState("");
+  const { token, user } = useSessionContext();
+  const { get } = useAPI();
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (word.trim()) {
-      seterror(false);
-      router.push(`/training?word=${word}`);
-    } else {
-      seterror(true);
-    }
-    // const nada = "AAAAAAAAAAAAAAAAAaa";
+      setError("");
 
-    // Validar que haya algo escrito
-    // NO Muestras error
-    // SI mueves ruta
+      const response = await get(
+        `words/exists/${user?.id}/${word.toLowerCase()}`,
+        token
+      );
+
+      if (!response) setError("Hubo un problema de conexión");
+
+      if (!response.exists) router.push(`/training?word=${word.toLowerCase()}`);
+      else setError("La palabra ya existe");
+    } else {
+      setError("Por favor ingresa una palabra");
+    }
   };
 
   return (
@@ -69,13 +77,11 @@ const Train = () => {
             placeholder="Ingresa la palabra nueva"
             className="items-center text-lg text-center"
             value={word}
-            onChangeText={(text) => stword(text)}
+            onChangeText={setWord}
           />
         </View>
-        {error && word === "" && (
-          <Text className="text-red-400 text-center mt-2">
-            Por favor, ingresa una palabra
-          </Text>
+        {error && (
+          <Text className="text-red-400 text-center mt-2">{error}</Text>
         )}
         <Pressable
           onPress={handleSubmit}

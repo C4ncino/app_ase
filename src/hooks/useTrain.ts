@@ -30,19 +30,13 @@ const useTrain = (word: string) => {
   const [taskId, setTaskId] = useState("");
 
   useEffect(() => {
-    console.log("useEffect de Conectado");
-
     if (isConnected) start();
     setData([]);
   }, [isConnected]);
 
-  useEffect(() => {
-    console.log("useEffect de state");
-    setMessage(messages[state]);
-  }, [state]);
+  useEffect(() => setMessage(messages[state]), [state]);
 
   useEffect(() => {
-    console.log("useEffect de data");
     if (taskId === "") {
       setReceiving(false);
 
@@ -59,8 +53,6 @@ const useTrain = (word: string) => {
   };
 
   const validate = async () => {
-    setReceiving(false);
-
     const response: ValidateResponse = await post(
       "train/validate",
       JSON.stringify({ sensor_data: decodeGloveData(data) }),
@@ -68,10 +60,10 @@ const useTrain = (word: string) => {
     );
 
     if (response) {
-      setData((d) => d.filter((_, i) => !response.samples.includes(i)));
-
       if (response.success) setTaskId(response.task);
       else setState(6);
+
+      setData((d) => d.filter((_, i) => !response.samples.includes(i)));
     }
   };
 
@@ -112,7 +104,7 @@ const useTrain = (word: string) => {
         setTaskId(trainResponse.task);
         clearInterval(intervalId);
       }
-    }, 2000);
+    }, 10000);
   };
 
   const checkTraining = () => {
@@ -121,7 +113,7 @@ const useTrain = (word: string) => {
 
       if (response && response.ready) {
         const modelResponse = await get(
-          `train/${response.word.id}/model`,
+          `words/${response.word.id}/model`,
           token
         );
 
@@ -137,15 +129,15 @@ const useTrain = (word: string) => {
             },
             response.word.id
           );
+
+          setState(3);
+
+          setTaskId(response.train_large_task);
+
+          clearInterval(intervalId);
         }
-
-        setState(3);
-
-        setTaskId(response.train_large_task);
-
-        clearInterval(intervalId);
       }
-    }, 5000);
+    }, 10000);
   };
 
   const checkLargeModel = () => {
@@ -161,19 +153,33 @@ const useTrain = (word: string) => {
           "generalModel/"
         );
 
+        console.log("model Saved!");
+
         setLargeModel({
           model_path: modelPath,
+          last_update: response.result.last_update,
         });
 
         setState(4);
+        setTaskId("");
+
+        console.log("state set to 4");
+
         clearInterval(intervalId);
       }
-    }, 5000);
+    }, 10000);
+  };
+
+  const refreshToken = async () => {
+    await refresh();
+    setState(5);
   };
 
   useEffect(() => {
-    console.log("useEffect de taskId");
-    if (taskId === "") return;
+    if (taskId === "") {
+      if (state === 4) refreshToken();
+      return;
+    }
     switch (state) {
       case 1:
         checkValidate();
@@ -186,13 +192,6 @@ const useTrain = (word: string) => {
       case 3:
         checkLargeModel();
         break;
-
-      case 4:
-        const intervalId = setInterval(async () => {
-          await refresh();
-          setState(5);
-          clearInterval(intervalId);
-        }, 1000);
     }
   }, [taskId]);
 

@@ -5,12 +5,13 @@ import {
   ActivityIndicator,
   Pressable,
 } from "react-native";
-import { useFocusEffect, useLocalSearchParams } from "expo-router";
-import { useBleContext } from "@/hooks/useBLEContext";
-import useTrain from "@/hooks/useTrain";
-import GettingData from "@/components/train/GettingData";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useCallback } from "react";
+import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+
+import useTrain from "@/hooks/useTrain";
+import { useBleContext } from "@/hooks/useBLEContext";
+import GettingData from "@/components/train/GettingData";
 
 const Training = () => {
   const { word } = useLocalSearchParams();
@@ -22,7 +23,7 @@ const Training = () => {
   useFocusEffect(
     useCallback(() => {
       return () => setReceiving(false);
-    }, [setReceiving])
+    }, [])
   );
 
   return (
@@ -36,6 +37,11 @@ const Training = () => {
             <View className="w-full justify-center items-center gap-5">
               <ActivityIndicator size={72} color="#0088cc" />
               <Text>{message}</Text>
+              {state === 5 && (
+                <Pressable onPress={() => router.replace("/")}>
+                  <Text>Volver al inicio</Text>
+                </Pressable>
+              )}
               {state === 6 && (
                 <Pressable onPress={goBackToGetData}>
                   <Text>Volver a tomar muestras</Text>

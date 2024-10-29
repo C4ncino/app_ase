@@ -23,7 +23,7 @@ type Models = Record<int, Model>;
 type ModelsContextModel = {
   saveModel: (modelData: ModelData, dirName: string) => Promise<string>;
 
-  setLargeModel: React.Dispatch<React.SetStateAction<Model | undefined>>;
+  setLargeModel: React.Dispatch<React.SetStateAction<LargeModel | undefined>>;
   addSmallModel: (model: Model, id: number) => void;
 
   getLargeModel: () => Promise<LayersModel | undefined>;
