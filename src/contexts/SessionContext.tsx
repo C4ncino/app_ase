@@ -6,6 +6,7 @@ import useAPI from "@/hooks/useAPI";
 import { useBleContext } from "@/hooks/useBLEContext";
 
 export const SessionContext = React.createContext<SessionContextModel>({
+  wordsCount: 0,
   login: () => new Promise((resolve) => resolve(false)),
   signUp: () => new Promise((resolve) => resolve(false)),
   logout: () => {},
@@ -19,6 +20,7 @@ type Props = {
 const SessionContextProvider = ({ children }: Props) => {
   const [user, setUser] = useState<User>();
   const [token, setToken] = useState<Token>();
+  const [wordsCount, setWordCount] = useState(0);
   const { get, post } = useAPI();
 
   const { forget } = useBleContext();
@@ -63,6 +65,18 @@ const SessionContextProvider = ({ children }: Props) => {
     });
 
     setToken(token);
+
+    const count = await AsyncStorage.getItem("wordsCount");
+
+    if (count) setWordCount(Number(count));
+    else {
+      const response = await get("words/how-many/" + user.id, token);
+
+      if (response) {
+        await AsyncStorage.setItem("wordsCount", response.count.toString());
+        setWordCount(response.count);
+      }
+    }
 
     await AsyncStorage.setItem("token", token);
   };
@@ -111,6 +125,7 @@ const SessionContextProvider = ({ children }: Props) => {
   };
 
   const sessionContext: SessionContextModel = {
+    wordsCount,
     user,
     token,
     login,

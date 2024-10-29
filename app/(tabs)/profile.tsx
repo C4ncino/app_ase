@@ -3,7 +3,7 @@ import { useSessionContext } from "@/hooks/useSessionContext";
 import ProfileSvg from "@/svgs/Profile";
 
 const Home = () => {
-  const { user } = useSessionContext();
+  const { user, wordsCount } = useSessionContext();
 
   return (
     <ScrollView className="bg-blue-40">
@@ -34,13 +34,6 @@ const Home = () => {
             <View className="px-24">
               <Text className="items-center font-semibold text-lg">Datos</Text>
             </View>
-            {/* <Pressable
-              onPress={() => {
-                console.log("Hola");
-              }}
-            >
-              <Feather name="edit-3" size={22} color="black" />
-            </Pressable> */}
           </View>
           <View className="mt-5 flex-row justify-between items-center mx-4 py-1 border-b-2 border-blue-400 mb-3">
             <Text className=" mb-5- px-4 text-lg   ">E-mail:</Text>
@@ -61,7 +54,7 @@ const Home = () => {
           </View>
           <View className=" flex-row justify-between items-center mx-4 py-1 border-b-2 border-blue-400 mb-6">
             <Text className=" mb-5-  px-4 text-lg   ">Número de palabras:</Text>
-            <Text className=" px-4 text-lg  ">{}</Text>
+            <Text className=" px-4 text-lg  ">{wordsCount}</Text>
           </View>
         </View>
       </View>
