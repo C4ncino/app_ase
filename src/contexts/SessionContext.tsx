@@ -112,6 +112,8 @@ const SessionContextProvider = ({ children }: Props) => {
       await refresh();
     };
 
+    if (!isConnected) return;
+
     getToken();
   }, []);
 
