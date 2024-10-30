@@ -3,8 +3,8 @@ type StringSetter = React.Dispatch<React.SetStateAction<string>>;
 interface BLEContextModel {
   batteryLevel?: number;
   isConnected: boolean;
-  data: string[][];
-  setData: React.Dispatch<React.SetStateAction<string[][]>>;
+  data: RawData;
+  setData: React.Dispatch<React.SetStateAction<RawData>>;
   receiving: boolean;
   setReceiving: React.Dispatch<React.SetStateAction<boolean>>;
   scan: (setMessage: StringSetter) => void;

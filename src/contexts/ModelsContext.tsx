@@ -28,6 +28,8 @@ export const ModelsContext = createContext<ModelsContextModel>({
 
   getLargeModel: () => Promise.resolve(undefined),
   getSmallModel: () => Promise.resolve(undefined),
+
+  getMeaning: () => "",
 });
 
 interface Props extends PropsWithChildren {}
@@ -153,6 +155,8 @@ const ModelsContextProvider = ({ children }: Props) => {
     return await load(modelInfo.model_path);
   };
 
+  const getMeaning = (id: number) => smallModels[id].meaning;
+
   const modelsContext: ModelsContextModel = {
     smallModels,
     largeModel,
@@ -161,6 +165,7 @@ const ModelsContextProvider = ({ children }: Props) => {
     addSmallModel,
     getLargeModel,
     getSmallModel,
+    getMeaning,
   };
 
   return (

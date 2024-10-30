@@ -1,50 +1,39 @@
 import { View, Text, Pressable } from "react-native";
 import Entypo from "@expo/vector-icons/Entypo";
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useState } from "react";
 import { useBleContext } from "@/hooks/useBLEContext";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import useCountdown from "@/hooks/useCountdown";
-import { router, useFocusEffect } from "expo-router";
-import useBase64 from "@/hooks/useBase64";
-import { useModelsContext } from "@/hooks/useModelsContext";
-import { tensor2d } from "@tensorflow/tfjs";
+import { useFocusEffect } from "expo-router";
+import { useTranslate } from "@/hooks/useTranslate";
 
 const Translate = () => {
   const { isConnected, setReceiving, setData, data } = useBleContext();
-  const { decodeForTranslate } = useBase64();
-  const { getLargeModel } = useModelsContext();
   const { start, pause, counter, isCounting } = useCountdown(
     () => setReceiving(true),
     () => setReceiving(false)
   );
+  const [message, setMessage] = useState("");
+  const { translate } = useTranslate(setMessage);
 
   useFocusEffect(
     useCallback(() => {
       setData([]);
+
+      return () => {
+        setReceiving(false);
+      };
     }, [])
   );
 
-  const translate = async (rawData: RawMovement) => {
-    const data = decodeForTranslate(rawData);
-
-    const model = await getLargeModel();
-
-    if (!model) router.replace("/");
-
-    const tensorData = tensor2d(data, [60, 8]);
-
-    console.log(tensorData);
-
-    // const prediction = model?.predict(tensorData);
-
-    // console.log(prediction);
-  };
-
   useEffect(() => {
-    // console.log("Total de datos: ", data.length);
-    // data.forEach((d) => {
-    //   console.log(d.length);
-    // });
+    if (data.length === 0) return;
+
+    const currentMovement = data.shift();
+
+    if (!currentMovement) return;
+
+    translate(currentMovement);
   }, [data]);
 
   return (
@@ -52,9 +41,11 @@ const Translate = () => {
       {isConnected ? (
         <View className="items-center">
           <View className="mx-9 bg-blue-30 items-center py-4 rounded-3xl relative w-80 h-5/6">
-            <Text className="text-xl text-gray-400 mt-2 mb-2">Traduciendo</Text>
+            <Text className="text-xl text-gray-400 mt-2 mb-2">
+              {isCounting || counter === 0 ? "Traduciendo" : ""}
+            </Text>
             <View className="flex-1 px-4 mt-2">
-              <Text className="text-justify text-lg">Hola Como estas</Text>
+              <Text className="text-justify text-lg">{message}</Text>
             </View>
             {isCounting && counter > 0 && (
               <Text className="text-6xl  text-gray-600 ">{counter}</Text>

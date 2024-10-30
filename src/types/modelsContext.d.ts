@@ -33,4 +33,6 @@ type ModelsContextModel = {
 
   getLargeModel: () => Promise<LayersModel | undefined>;
   getSmallModel: (id: number) => Promise<LayersModel | undefined>;
+
+  getMeaning: (id: number) => string | undefined;
 };
