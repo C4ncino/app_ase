@@ -53,8 +53,8 @@ const ModelsContextProvider = ({ children }: Props) => {
   }
 
   useEffect(() => {
-    logAllFilesInDirectory(baseDir);
     createDir("models");
+    logAllFilesInDirectory(baseDir);
   }, []);
 
   const createDir = async (dirName: string) => {

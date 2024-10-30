@@ -80,6 +80,8 @@ const BLEContextProvider = ({ children }: Props) => {
         if (error) return;
 
         if (scannedDevice?.name?.includes(blePrefix)) {
+          console.log(scannedDevice.name);
+
           setMessage(bleMessages[2]);
 
           if (!scannedDevice.id) return;

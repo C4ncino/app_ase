@@ -1,16 +1,15 @@
 import { useCallback, useState } from "react";
-import { SectionList, View, Text, Pressable } from "react-native";
+import Popover from "react-native-popover-view";
+import { router, useFocusEffect } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import TitleHeader from "@/components/Vocabulary/TitleHeader";
-import WordListItem from "@/components/Vocabulary/WordListItem";
-import { Feather } from "@expo/vector-icons";
-import { Link, router, useFocusEffect } from "expo-router";
+import { SectionList, View, Text, Pressable } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Octicons, MaterialCommunityIcons } from "@expo/vector-icons";
+
 import useAPI from "@/hooks/useAPI";
 import { useSessionContext } from "@/hooks/useSessionContext";
-import Octicons from "@expo/vector-icons/Octicons";
-import Popover from "react-native-popover-view";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import TitleHeader from "@/components/Vocabulary/TitleHeader";
+import WordListItem from "@/components/Vocabulary/WordListItem";
 
 const Vocabulary = () => {
   const [wordsLists, setWordsLists] = useState<WordList[]>([]);
@@ -30,17 +29,18 @@ const Vocabulary = () => {
         const response = await get(`words/${user?.id}`, token);
 
         if (response) {
+          await refresh();
+
           if (dbWords && JSON.stringify(response.words) === dbWords) return;
 
           setWordsLists(response.words);
-          await AsyncStorage.setItem("words", JSON.stringify(response.words));
 
-          refresh();
+          await AsyncStorage.setItem("words", JSON.stringify(response.words));
         }
       };
 
       getWords();
-    }, [user, token])
+    }, [user])
   );
 
   return (
@@ -71,12 +71,6 @@ const Vocabulary = () => {
             </Text>
           </Popover>
         </View>
-
-        {/* <View className="border-2 border-green-500 rounded-full flex items-baseline absolute right-4">
-          <Link href="/train">
-            <Feather name="plus" size={24} color="green" />
-          </Link>
-        </View> */}
       </View>
       <SectionList
         className="mx-4 px-2 bg-white rounded-3xl h-[91%]"

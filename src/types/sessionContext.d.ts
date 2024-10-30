@@ -33,6 +33,7 @@ interface UserResponse {
 
 interface SessionContextModel {
   wordsCount: number;
+  updateWordsCount: () => Promise<void>;
   user?: User;
   token?: Token;
   login: (data: LoginInfo) => Promise<boolean>;

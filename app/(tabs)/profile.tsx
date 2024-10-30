@@ -1,9 +1,14 @@
 import { View, Text, ScrollView } from "react-native";
 import { useSessionContext } from "@/hooks/useSessionContext";
 import ProfileSvg from "@/svgs/Profile";
+import { useEffect } from "react";
 
 const Home = () => {
-  const { user, wordsCount } = useSessionContext();
+  const { user, wordsCount, updateWordsCount } = useSessionContext();
+
+  useEffect(() => {
+    updateWordsCount();
+  }, []);
 
   return (
     <ScrollView className="bg-blue-40">

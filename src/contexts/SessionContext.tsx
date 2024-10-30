@@ -7,6 +7,7 @@ import { useBleContext } from "@/hooks/useBLEContext";
 
 export const SessionContext = React.createContext<SessionContextModel>({
   wordsCount: 0,
+  updateWordsCount: () => new Promise((resolve) => resolve()),
   login: () => new Promise((resolve) => resolve(false)),
   signUp: () => new Promise((resolve) => resolve(false)),
   logout: () => {},
@@ -36,9 +37,11 @@ const SessionContextProvider = ({ children }: Props) => {
 
       const response = await get("users/me", token ? token : "");
 
-      if (!response) logout();
+      if (!response) await logout();
 
-      setSessionData(response.user, token);
+      await setSessionData(response.user, token);
+
+      await refresh();
     };
 
     getToken();
@@ -66,19 +69,23 @@ const SessionContextProvider = ({ children }: Props) => {
 
     setToken(token);
 
-    const count = await AsyncStorage.getItem("wordsCount");
-
-    if (count) setWordCount(Number(count));
-    else {
-      const response = await get("words/how-many/" + user.id, token);
-
-      if (response) {
-        await AsyncStorage.setItem("wordsCount", response.count.toString());
-        setWordCount(response.count);
-      }
-    }
-
     await AsyncStorage.setItem("token", token);
+
+    await updateWordsCount();
+  };
+
+  const updateWordsCount = async () => {
+    try {
+      const res = await get("words/how-many/" + user?.id, token);
+
+      if (!res) throw new Error();
+
+      await AsyncStorage.setItem("wordsCount", res.count.toString());
+      setWordCount(res.count);
+    } catch {
+      const count = await AsyncStorage.getItem("wordsCount");
+      setWordCount(count ? parseInt(count) : 0);
+    }
   };
 
   const login = async (data: LoginInfo) => {
@@ -115,6 +122,8 @@ const SessionContextProvider = ({ children }: Props) => {
   };
 
   const refresh = async () => {
+    console.log(token);
+
     const response = await get("users/refresh", token);
 
     if (!response) await logout();
@@ -126,6 +135,7 @@ const SessionContextProvider = ({ children }: Props) => {
 
   const sessionContext: SessionContextModel = {
     wordsCount,
+    updateWordsCount,
     user,
     token,
     login,
