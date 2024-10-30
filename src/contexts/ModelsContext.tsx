@@ -19,6 +19,8 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const ModelsContext = createContext<ModelsContextModel>({
+  largeModel: undefined,
+  smallModels: {},
   saveModel: () => Promise.resolve(""),
 
   setLargeModel: () => {},
@@ -152,6 +154,8 @@ const ModelsContextProvider = ({ children }: Props) => {
   };
 
   const modelsContext: ModelsContextModel = {
+    smallModels,
+    largeModel,
     saveModel,
     setLargeModel,
     addSmallModel,

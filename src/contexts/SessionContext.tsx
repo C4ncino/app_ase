@@ -4,6 +4,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import useAPI from "@/hooks/useAPI";
 import { useBleContext } from "@/hooks/useBLEContext";
+import { useModelsContext } from "@/hooks/useModelsContext";
+import { useNetworkContext } from "@/hooks/useNetworkContext";
 
 export const SessionContext = React.createContext<SessionContextModel>({
   wordsCount: 0,
@@ -25,6 +27,66 @@ const SessionContextProvider = ({ children }: Props) => {
   const { get, post } = useAPI();
 
   const { forget } = useBleContext();
+  const { isConnected } = useNetworkContext();
+  const { setLargeModel, saveModel, addSmallModel, largeModel, smallModels } =
+    useModelsContext();
+
+  useEffect(() => {
+    if (!isConnected || !user || !token) return;
+
+    const fetchModels = async () => {
+      if (!largeModel) return;
+
+      const response = await post(
+        "models/check-version/" + user?.id,
+        JSON.stringify({
+          date: largeModel?.last_update,
+        }),
+        token
+      );
+
+      if (response && !response.updated) {
+        const modelPath = await saveModel(
+          response.model.model,
+          "generalModel/"
+        );
+
+        setLargeModel({
+          model_path: modelPath,
+          last_update: response.model.last_update,
+        });
+      }
+
+      const modelsCount = Object.keys(smallModels).length;
+
+      if (modelsCount === wordsCount) return;
+
+      for (let i = 0; i < modelsCount; i++) {
+        if (smallModels[i]) continue;
+
+        const response = await get("words/get-class-key/" + i, token);
+
+        if (response) {
+          const word = response.word;
+
+          const modelPath = await saveModel(
+            response.model,
+            `${word.class_key}/`
+          );
+
+          addSmallModel(
+            {
+              meaning: word.word,
+              model_path: modelPath,
+            },
+            word.class_key
+          );
+        }
+      }
+    };
+
+    fetchModels();
+  }, [isConnected, user, token]);
 
   useEffect(() => {
     const getToken = async () => {
@@ -122,8 +184,6 @@ const SessionContextProvider = ({ children }: Props) => {
   };
 
   const refresh = async () => {
-    console.log(token);
-
     const response = await get("users/refresh", token);
 
     if (!response) await logout();

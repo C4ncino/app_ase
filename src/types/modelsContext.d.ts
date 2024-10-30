@@ -9,6 +9,8 @@ type ModelData = {
   };
 };
 
+type ClassKey = number;
+
 type Model = {
   meaning?: string;
   model_path: string;
@@ -18,9 +20,12 @@ interface LargeModel extends Model {
   last_update: string;
 }
 
-type Models = Record<int, Model>;
+type Models = Record<ClassKey, Model>;
 
 type ModelsContextModel = {
+  largeModel: LargeModel | undefined;
+  smallModels: Models;
+
   saveModel: (modelData: ModelData, dirName: string) => Promise<string>;
 
   setLargeModel: React.Dispatch<React.SetStateAction<LargeModel | undefined>>;
