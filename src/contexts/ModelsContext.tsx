@@ -58,7 +58,6 @@ const ModelsContextProvider = ({ children }: Props) => {
     createDir("models");
     logAllFilesInDirectory(baseDir);
 
-    // TODO: Load from AsyncStorage
     const loadModelsInfo = async () => {
       const largeModelJson = await AsyncStorage.getItem("largeModel");
       const smallModelsJson = await AsyncStorage.getItem("smallModels");
@@ -74,6 +73,7 @@ const ModelsContextProvider = ({ children }: Props) => {
     console.log("🚀 ~ ModelsContextProvider ~ largeModel:", largeModel);
 
     const saveLargeModel = async () => {
+      if (!largeModel) return;
       await AsyncStorage.setItem("largeModel", JSON.stringify(largeModel));
     };
 

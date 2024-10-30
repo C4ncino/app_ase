@@ -8,11 +8,11 @@ import ModelsContextProvider from "./ModelsContext";
 const ContextWrapper = ({ children }: PropsWithChildren) => {
   return (
     <BLEContextProvider>
-      <SessionContextProvider>
-        <ModelsContextProvider>
+      <ModelsContextProvider>
+        <SessionContextProvider>
           <SafeAreaProvider>{children}</SafeAreaProvider>
-        </ModelsContextProvider>
-      </SessionContextProvider>
+        </SessionContextProvider>
+      </ModelsContextProvider>
     </BLEContextProvider>
   );
 };
