@@ -1,3 +1,9 @@
+type RawData = string[][];
+
+type RawMovement = string[];
+
+type RawFrame = string;
+
 type Frame = {
   thumb: number;
   index: number;
@@ -12,3 +18,16 @@ type Frame = {
 type Movement = Frame[];
 
 type TrainingData = Movement[];
+
+type FrameArray = [
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+];
+
+type MovementArray = FrameArray[];

@@ -8,6 +8,7 @@ import {
   readDirectoryAsync,
 } from "expo-file-system";
 import { loadLayersModel } from "@tensorflow/tfjs";
+
 import {
   LargeModel,
   Model,
@@ -15,6 +16,7 @@ import {
   Models,
   ModelsContextModel,
 } from "@/types/modelsContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const ModelsContext = createContext<ModelsContextModel>({
   saveModel: () => Promise.resolve(""),
@@ -55,7 +57,38 @@ const ModelsContextProvider = ({ children }: Props) => {
   useEffect(() => {
     createDir("models");
     logAllFilesInDirectory(baseDir);
+
+    // TODO: Load from AsyncStorage
+    const loadModelsInfo = async () => {
+      const largeModelJson = await AsyncStorage.getItem("largeModel");
+      const smallModelsJson = await AsyncStorage.getItem("smallModels");
+
+      if (largeModelJson) setLargeModel(JSON.parse(largeModelJson));
+      if (smallModelsJson) setSmallModels(JSON.parse(smallModelsJson));
+    };
+
+    loadModelsInfo();
   }, []);
+
+  useEffect(() => {
+    console.log("🚀 ~ ModelsContextProvider ~ largeModel:", largeModel);
+
+    const saveLargeModel = async () => {
+      await AsyncStorage.setItem("largeModel", JSON.stringify(largeModel));
+    };
+
+    saveLargeModel();
+  }, [largeModel]);
+
+  useEffect(() => {
+    console.log("🚀 ~ saveSmallModels ~ smallModels:", smallModels);
+
+    const saveSmallModels = async () => {
+      await AsyncStorage.setItem("smallModels", JSON.stringify(smallModels));
+    };
+
+    saveSmallModels();
+  }, [smallModels]);
 
   const createDir = async (dirName: string) => {
     const dirInfo = await getInfoAsync(baseDir + dirName);
@@ -102,11 +135,7 @@ const ModelsContextProvider = ({ children }: Props) => {
     setSmallModels({ ...smallModels, [id]: model });
   };
 
-  const load = async (modelPath: string) => {
-    const model = await loadLayersModel(modelPath);
-
-    return model;
-  };
+  const load = async (modelPath: string) => await loadLayersModel(modelPath);
 
   const getLargeModel = async () => {
     if (!largeModel) return undefined;

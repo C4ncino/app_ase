@@ -25,8 +25,8 @@ type Props = {
 const BLEContextProvider = ({ children }: Props) => {
   const manager = useMemo(() => new BleManager(), []);
 
-  let tempData: string[] = [];
-  const [data, setData] = useState<string[][]>([]);
+  let tempData: RawMovement = [];
+  const [data, setData] = useState<RawData>([]);
 
   const [macAddress, setMacAddress] = useState("");
   const [batteryLevel, setBatteryLevel] = useState(0);
@@ -34,6 +34,7 @@ const BLEContextProvider = ({ children }: Props) => {
   const [isConnected, setIsConnected] = useState(false);
 
   const { decodeUInt, decode, encodeBool } = useBase64();
+
   const {
     blePrefix,
     dataUUID,
@@ -135,7 +136,7 @@ const BLEContextProvider = ({ children }: Props) => {
                 setTimeout(() => {
                   console.log("🚀 ~ tempData:", tempData.length);
 
-                  if (tempData.length >= 55) setData((d) => [...d, tempData]);
+                  if (tempData.length >= 54) setData((d) => [...d, tempData]);
 
                   tempData = [];
                 }, 1000);

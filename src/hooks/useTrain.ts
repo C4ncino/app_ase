@@ -153,8 +153,6 @@ const useTrain = (word: string) => {
           "generalModel/"
         );
 
-        console.log("model Saved!");
-
         setLargeModel({
           model_path: modelPath,
           last_update: response.result.last_update,
@@ -162,9 +160,6 @@ const useTrain = (word: string) => {
 
         setState(4);
         setTaskId("");
-
-        console.log("state set to 4");
-
         clearInterval(intervalId);
       }
     }, 10000);
