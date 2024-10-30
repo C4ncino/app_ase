@@ -18,19 +18,23 @@ export default function Component() {
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
+  const [isFecthing, setIsFecthing] = useState(false);
 
   const { login } = useSessionContext();
 
   const handleLogin = async () => {
+    setIsFecthing(true);
     setError("");
 
     if (!email || !password) {
       setError(errors[0]);
+      setIsFecthing(false);
       return;
     }
 
     if (!emailRegex.test(email)) {
       setError(errors[1]);
+      setIsFecthing(false);
       return;
     }
 
@@ -38,6 +42,7 @@ export default function Component() {
 
     if (!success) {
       setError(errors[2]);
+      setIsFecthing(false);
       return;
     }
 
@@ -107,6 +112,7 @@ export default function Component() {
         )}
         <View className="justify-center items-center">
           <Pressable
+            disabled={isFecthing}
             onPress={handleLogin}
             style={({ pressed }) => [
               {

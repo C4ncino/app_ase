@@ -39,22 +39,27 @@ const SignUp = () => {
   const [password, setPassword] = useState("");
   const [cpassword, setCPassword] = useState("");
   const [error, setError] = useState("");
+  const [isFecthing, setIsFecthing] = useState(false);
 
   const { signUp } = useSessionContext();
 
   const onSubmit = async () => {
+    setIsFecthing(true);
     if (!name || !lastName || !bday || !email || !password || !cpassword) {
+      setIsFecthing(false);
       setError(messages[0]);
       return;
     }
 
     if (!emailRegex.test(email)) {
       setError(messages[1]);
+      setIsFecthing(false);
       return;
     }
 
     if (password !== cpassword) {
       setError(messages[2]);
+      setIsFecthing(false);
       return;
     }
 
@@ -71,6 +76,7 @@ const SignUp = () => {
     }
 
     setError(messages[3]);
+    setIsFecthing(false);
   };
 
   return (
@@ -175,6 +181,7 @@ const SignUp = () => {
         )}
         <View className="items-center">
           <Pressable
+            disabled={isFecthing}
             onPress={onSubmit}
             style={({ pressed }) => [
               {

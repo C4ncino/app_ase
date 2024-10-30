@@ -46,6 +46,8 @@ const SessionContextProvider = ({ children }: Props) => {
       );
 
       if (response && !response.updated) {
+        console.log("new large model");
+
         const modelPath = await saveModel(
           response.model.model,
           "generalModel/"
@@ -58,11 +60,14 @@ const SessionContextProvider = ({ children }: Props) => {
       }
 
       const modelsCount = Object.keys(smallModels).length;
+      console.log("🚀 ~ fetchModels ~ modelsCount:", modelsCount);
 
       if (modelsCount === wordsCount) return;
 
       for (let i = 0; i < modelsCount; i++) {
         if (smallModels[i]) continue;
+
+        console.log("Fetching model: ", i);
 
         const response = await get("words/get-class-key/" + i, token);
 
@@ -91,9 +96,10 @@ const SessionContextProvider = ({ children }: Props) => {
   useEffect(() => {
     const getToken = async () => {
       const token = await AsyncStorage.getItem("token");
+      console.log(token);
 
       if (!token) {
-        router.replace("/login");
+        await logout();
         return;
       }
 
@@ -183,8 +189,10 @@ const SessionContextProvider = ({ children }: Props) => {
     router.replace("/login");
   };
 
-  const refresh = async () => {
-    const response = await get("users/refresh", token);
+  const refresh = async (inToken?: Token) => {
+    if (!inToken) inToken = token;
+
+    const response = await get("users/refresh", inToken);
 
     if (!response) await logout();
 
