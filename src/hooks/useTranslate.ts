@@ -1,6 +1,15 @@
-import { tensor2d, Tensor2D, tidy, Tensor, Rank } from "@tensorflow/tfjs";
+import {
+  tensor2d,
+  Tensor2D,
+  tidy,
+  Tensor,
+  Rank,
+  ready,
+  backend,
+} from "@tensorflow/tfjs";
 import useBase64 from "./useBase64";
 import { useModelsContext } from "./useModelsContext";
+import { useEffect } from "react";
 
 export const useTranslate = (
   setMessage: React.Dispatch<React.SetStateAction<string>>
@@ -9,10 +18,18 @@ export const useTranslate = (
   const { getLargeModel, getSmallModel, getMeaning } = useModelsContext();
   const threshold = 0.5;
 
+  useEffect(() => {
+    const start = async () => {
+      await ready();
+      backend();
+    };
+
+    start();
+  }, []);
+
   const getInput = (rawData: RawMovement) => {
     const data = decodeForTranslate(rawData);
-
-    return tensor2d(data, [60, 8]);
+    return tensor2d(data, [60, 8], "float32");
   };
 
   const flatResult = async (result: Tensor<Rank> | Tensor<Rank>[]) => {
@@ -68,29 +85,28 @@ export const useTranslate = (
   };
 
   const translate = async (rawData: RawMovement): Promise<void> => {
-    const tensor = getInput(rawData);
+    await ready();
 
-    const predictions = await getLargePredictions(tensor);
+    tensor2d([1, 2, 3, 4], [4, 1], "float32");
 
-    if (!predictions) return;
-
-    let best = -1;
-    let bestIndex = -1;
-
-    for (const prediction of predictions) {
-      const smallPrediction = await getSmallPrediction(tensor, prediction);
-
-      if (!smallPrediction) continue;
-
-      if (smallPrediction > best) {
-        best = smallPrediction;
-        bestIndex = prediction;
-      }
-    }
-
-    if (best === -1) return;
-
-    setMessage((m) => `${m} ${getMeaning(bestIndex)}`);
+    // const tensor = getInput(rawData);
+    // console.log("🚀 ~ translate ~ tensor:", tensor);
+    // const predictions = await getLargePredictions(tensor);
+    // console.log("🚀 ~ translate ~ predictions:", predictions);
+    // if (!predictions) return;
+    // let best = -1;
+    // let bestIndex = -1;
+    // for (const prediction of predictions) {
+    //   const smallPrediction = await getSmallPrediction(tensor, prediction);
+    //   console.log("🚀 ~ translate ~ smallPrediction:", smallPrediction);
+    //   if (!smallPrediction) continue;
+    //   if (smallPrediction > best) {
+    //     best = smallPrediction;
+    //     bestIndex = prediction;
+    //   }
+    // }
+    // if (best === -1) return;
+    // setMessage((m) => `${m} ${getMeaning(bestIndex)}`);
   };
 
   return {

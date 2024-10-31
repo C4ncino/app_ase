@@ -23,6 +23,8 @@ export default function Component() {
   const { login } = useSessionContext();
 
   const handleLogin = async () => {
+    console.log("enter");
+
     setIsFecthing(true);
     setError("");
 

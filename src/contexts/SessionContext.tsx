@@ -27,7 +27,7 @@ const SessionContextProvider = ({ children }: Props) => {
   const { get, post } = useAPI();
 
   const { forget } = useBleContext();
-  const { isConnected } = useNetworkContext();
+  const { isConnected, lookForConnection } = useNetworkContext();
   const { setLargeModel, saveModel, addSmallModel, largeModel, smallModels } =
     useModelsContext();
 
@@ -90,7 +90,7 @@ const SessionContextProvider = ({ children }: Props) => {
       }
     };
 
-    fetchModels();
+    // fetchModels();
   }, [isConnected, user, token]);
 
   useEffect(() => {
@@ -115,7 +115,7 @@ const SessionContextProvider = ({ children }: Props) => {
     if (!isConnected) return;
 
     getToken();
-  }, []);
+  }, [isConnected]);
 
   const convertDateString = (dateStr: string) => {
     const [datePart, timePart] = dateStr.split(" ");

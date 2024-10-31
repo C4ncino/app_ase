@@ -1,5 +1,5 @@
 import { View, Text, Pressable } from "react-native";
-import Entypo from "@expo/vector-icons/Entypo";
+import { Entypo } from "@expo/vector-icons";
 import { useEffect, useCallback, useState } from "react";
 import { useBleContext } from "@/hooks/useBLEContext";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
@@ -23,7 +23,7 @@ const Translate = () => {
       return () => {
         setReceiving(false);
       };
-    }, [])
+    }, [isConnected])
   );
 
   useEffect(() => {

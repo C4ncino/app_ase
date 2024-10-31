@@ -7,7 +7,7 @@ import {
   EncodingType,
   readDirectoryAsync,
 } from "expo-file-system";
-import { loadLayersModel } from "@tensorflow/tfjs";
+import { loadLayersModel, ready, backend } from "@tensorflow/tfjs";
 
 import {
   LargeModel,
@@ -63,6 +63,9 @@ const ModelsContextProvider = ({ children }: Props) => {
     logAllFilesInDirectory(baseDir);
 
     const loadModelsInfo = async () => {
+      await ready();
+      await backend();
+
       const largeModelJson = await AsyncStorage.getItem("largeModel");
       const smallModelsJson = await AsyncStorage.getItem("smallModels");
 

@@ -56,13 +56,19 @@ const useBase64 = () => {
       return frame;
     });
 
-    if (decodeData.length > 60) return decodeData.slice(0, 60);
+    if (decodeData.length > 60) decodeData.slice(0, 60);
 
     while (decodeData.length < 60) {
-      decodeData.push([0, 0, 0, 0, 0, 0, 0, 0]);
+      decodeData.push([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]);
     }
 
-    console.log(decodeData.length);
+    decodeData.map((d) => {
+      if (d === undefined) console.log(d);
+
+      d.map((dd) => {
+        if (dd === undefined) console.log(d);
+      });
+    });
 
     return decodeData;
   };
