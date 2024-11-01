@@ -2,10 +2,10 @@ import { View, Text, Pressable } from "react-native";
 import { Entypo } from "@expo/vector-icons";
 import { useEffect, useCallback, useState } from "react";
 import { useBleContext } from "@/hooks/useBLEContext";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import useCountdown from "@/hooks/useCountdown";
 import { useFocusEffect } from "expo-router";
 import { useTranslate } from "@/hooks/useTranslate";
+import NoGloveview from "@/components/NoGloveview";
 
 const Translate = () => {
   const { isConnected, setReceiving, setData, data } = useBleContext();
@@ -55,7 +55,6 @@ const Translate = () => {
           <View className="flex flex-row mt-4">
             {!isCounting ? (
               <Pressable
-                // className="w-24 h-24 justify-center rounded-full bg-white items-center"
                 onPress={start}
                 style={({ pressed }) => [
                   {
@@ -105,16 +104,7 @@ const Translate = () => {
           </View>
         </View>
       ) : (
-        <View className="justify-center items-center w-full h-full">
-          <MaterialCommunityIcons
-            name="alert-octagon-outline"
-            size={72}
-            color="#f55347"
-          />
-          <Text className="text-lg text-gray-600">
-            No se encontró un guante
-          </Text>
-        </View>
+        <NoGloveview />
       )}
     </View>
   );
