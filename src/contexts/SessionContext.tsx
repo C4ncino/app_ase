@@ -194,7 +194,10 @@ const SessionContextProvider = ({ children }: Props) => {
 
     const response = await get("users/refresh", inToken);
 
-    if (!response) await logout();
+    if (!response) {
+      await logout();
+      return;
+    }
 
     setToken(response.token);
 

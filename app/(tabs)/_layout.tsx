@@ -4,6 +4,8 @@ import DeviceLocalizer from "@/components/DeviceLocalizer";
 import { Tabs } from "expo-router";
 import { Text } from "react-native";
 import LogoutButton from "@/components/auth/LogoutButton";
+import Entypo from "@expo/vector-icons/Entypo";
+import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 
 const Layout = () => {
   return (
@@ -16,9 +18,13 @@ const Layout = () => {
       <Tabs.Screen
         name="index"
         options={{
-          title: "Inicio",
+          title: "Traducción",
           tabBarIcon: ({ color }) => (
-            <Ionicons name="home" color={color} size={24} />
+            <FontAwesome6
+              name="hands-asl-interpreting"
+              color={color}
+              size={24}
+            />
           ),
         }}
       />
@@ -27,11 +33,7 @@ const Layout = () => {
         options={{
           title: "Entrenamiento",
           tabBarIcon: ({ color }) => (
-            <FontAwesome6
-              name="hands-asl-interpreting"
-              color={color}
-              size={24}
-            />
+            <FontAwesome5 name="brain" size={24} color={color} />
           ),
         }}
       />

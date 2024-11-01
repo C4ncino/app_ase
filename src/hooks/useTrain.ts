@@ -25,7 +25,7 @@ const useTrain = (word: string) => {
   const { decodeGloveData } = useBase64();
   const { saveModel, addSmallModel, setLargeModel } = useModelsContext();
 
-  const [state, setState] = useState(0);
+  const [state, setState] = useState(5);
   const [message, setMessage] = useState("");
   const [taskId, setTaskId] = useState("");
 
