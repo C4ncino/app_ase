@@ -13,9 +13,9 @@ const useAPI = () => {
   };
 
   const result = async (response: AxiosResponse<any, any>) => {
-    console.log("🚀 ~ result ~ response:", response);
-    console.log("🚀 ~ result ~ response.status:", response.status);
-    console.log("🚀 ~ result ~ response.data:", response.data);
+    // console.log("🚀 ~ result ~ response:", response);
+    // console.log("🚀 ~ result ~ response.status:", response.status);
+    // console.log("🚀 ~ result ~ response.data:", response.data);
 
     if (response.status >= 300) return false;
 

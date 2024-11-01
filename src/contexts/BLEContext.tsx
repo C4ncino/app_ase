@@ -60,12 +60,16 @@ const BLEContextProvider = ({ children }: Props) => {
 
   useEffect(() => {
     const updateReceiving = async () => {
-      await manager.writeCharacteristicWithResponseForDevice(
-        macAddress,
-        dataUUID,
-        activeUUID,
-        encodeBool(receiving)
-      );
+      try {
+        await manager.writeCharacteristicWithResponseForDevice(
+          macAddress,
+          dataUUID,
+          activeUUID,
+          encodeBool(receiving)
+        );
+      } catch {
+        setReceiving(false);
+      }
     };
 
     if (isConnected) updateReceiving();
@@ -142,8 +146,6 @@ const BLEContextProvider = ({ children }: Props) => {
         if (error) return;
 
         if (scannedDevice?.name?.includes(blePrefix)) {
-          console.log(scannedDevice.name);
-
           setMessage(bleMessages[2]);
 
           if (!scannedDevice.id) return;

@@ -109,7 +109,7 @@ const SessionContextProvider = ({ children }: Props) => {
 
       await setSessionData(response.user, token);
 
-      await refresh();
+      await refresh(token);
     };
 
     if (!isConnected) return;
@@ -147,9 +147,7 @@ const SessionContextProvider = ({ children }: Props) => {
   const updateWordsCount = async () => {
     try {
       const res = await get("words/how-many/" + user?.id, token);
-
       if (!res) throw new Error();
-
       await AsyncStorage.setItem("wordsCount", res.count.toString());
       setWordCount(res.count);
     } catch {
