@@ -7,6 +7,7 @@ import {
   Pressable,
   StyleSheet,
   ScrollView,
+  ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useState } from "react";
@@ -15,21 +16,7 @@ import DatePicker from "@/components/DatePicker";
 import { messages } from "@/messages/signupMessages";
 import { emailRegex } from "@/utils/regex";
 import { useSessionContext } from "@/hooks/useSessionContext";
-
-const styles = StyleSheet.create({
-  LoginButt: {
-    backgroundColor: "#0088cc",
-    borderRadius: 100,
-    marginTop: 20,
-    height: 50,
-  },
-  textlog: {
-    textAlign: "center",
-    padding: 10,
-    fontStyle: "normal",
-    color: "#FFFFFF",
-  },
-});
+import sha256 from "crypto-js/sha256";
 
 const SignUp = () => {
   const [name, setName] = useState("");
@@ -41,7 +28,7 @@ const SignUp = () => {
   const [error, setError] = useState("");
   const [isFecthing, setIsFecthing] = useState(false);
 
-  const { signUp } = useSessionContext();
+  const { signUp, hash } = useSessionContext();
 
   const onSubmit = async () => {
     setIsFecthing(true);
@@ -68,7 +55,7 @@ const SignUp = () => {
       last_name: lastName,
       bday,
       email,
-      password,
+      password: hash(password),
     });
 
     if (success) {
@@ -181,7 +168,7 @@ const SignUp = () => {
         )}
         <View className="items-center">
           <Pressable
-            disabled={isFecthing}
+            // disabled={isFecthing}
             onPress={onSubmit}
             style={({ pressed }) => [
               {
@@ -200,9 +187,13 @@ const SignUp = () => {
               },
             ]}
           >
-            <View className="items-center">
-              <Text className="font-bold text-lg">Regístrate</Text>
-            </View>
+            {isFecthing ? (
+              <ActivityIndicator size={24} color={"#006699"} />
+            ) : (
+              <View className="items-center">
+                <Text className="font-bold text-lg">Regístrate</Text>
+              </View>
+            )}
           </Pressable>
         </View>
 

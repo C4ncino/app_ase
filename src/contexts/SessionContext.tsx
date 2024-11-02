@@ -6,6 +6,7 @@ import useAPI from "@/hooks/useAPI";
 import { useBleContext } from "@/hooks/useBLEContext";
 import { useModelsContext } from "@/hooks/useModelsContext";
 import { useNetworkContext } from "@/hooks/useNetworkContext";
+import sha256 from "crypto-js/sha256";
 
 export const SessionContext = React.createContext<SessionContextModel>({
   wordsCount: 0,
@@ -14,6 +15,7 @@ export const SessionContext = React.createContext<SessionContextModel>({
   signUp: () => new Promise((resolve) => resolve(false)),
   logout: () => {},
   refresh: () => new Promise((resolve) => resolve()),
+  hash: () => "",
 });
 
 type Props = {
@@ -156,6 +158,10 @@ const SessionContextProvider = ({ children }: Props) => {
     }
   };
 
+  const hash = (password: string) => {
+    return sha256(password).toString();
+  };
+
   const login = async (data: LoginInfo) => {
     const response = await post("users/login", JSON.stringify(data));
 
@@ -213,6 +219,7 @@ const SessionContextProvider = ({ children }: Props) => {
     signUp,
     logout,
     refresh,
+    hash,
   };
 
   return (

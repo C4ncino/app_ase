@@ -29,11 +29,11 @@ const Translate = () => {
   useEffect(() => {
     if (data.length === 0) return;
 
-    const currentMovement = data.shift();
+    // const currentMovement = data.shift();
 
-    if (!currentMovement) return;
+    // if (!currentMovement) return;
 
-    translate(currentMovement);
+    // translate(currentMovement);
   }, [data]);
 
   return (

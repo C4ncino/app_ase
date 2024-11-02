@@ -96,7 +96,7 @@ const Home = () => {
                   },
                 ]
           }
-          disabled={wordsCount === 0}
+          // disabled={wordsCount === 0}
         >
           <Text
             className={`w-72 text-center font-bold text-lg ${wordsCount === 0 ? "text-gray-400" : "text-blue-800"}`}

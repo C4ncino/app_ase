@@ -40,4 +40,5 @@ interface SessionContextModel {
   signUp: (data: SignupInfo) => Promise<boolean>;
   logout: () => void;
   refresh: () => Promise<void>;
+  hash: (password: string) => string;
 }

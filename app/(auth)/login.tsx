@@ -1,18 +1,19 @@
 import LoginSvg from "@/svgs/Login";
 import React, { useState } from "react";
 import { Link, router } from "expo-router";
-import { View, Text, TextInput, StyleSheet, Pressable } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  Pressable,
+  ActivityIndicator,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Fontisto, Entypo } from "@expo/vector-icons";
 import { useSessionContext } from "@/hooks/useSessionContext";
 import { errors } from "@/messages/loginMessages";
 import { emailRegex } from "@/utils/regex";
-
-const styles = StyleSheet.create({
-  inputContainer: {
-    flexDirection: "row",
-  },
-});
 
 export default function Component() {
   const [password, setPassword] = useState("");
@@ -20,11 +21,9 @@ export default function Component() {
   const [error, setError] = useState("");
   const [isFecthing, setIsFecthing] = useState(false);
 
-  const { login } = useSessionContext();
+  const { login, hash } = useSessionContext();
 
   const handleLogin = async () => {
-    console.log("enter");
-
     setIsFecthing(true);
     setError("");
 
@@ -40,7 +39,7 @@ export default function Component() {
       return;
     }
 
-    const success = await login({ email, password });
+    const success = await login({ email, password: hash(password) });
 
     if (!success) {
       setError(errors[2]);
@@ -133,9 +132,13 @@ export default function Component() {
               },
             ]}
           >
-            <View className="items-center">
-              <Text className="font-bold text-lg">Iniciar sesión</Text>
-            </View>
+            {isFecthing ? (
+              <ActivityIndicator size={24} color={"#006699"} />
+            ) : (
+              <View className="items-center">
+                <Text className="font-bold text-lg">Iniciar sesión</Text>
+              </View>
+            )}
           </Pressable>
         </View>
 

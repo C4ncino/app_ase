@@ -197,7 +197,10 @@ const BLEContextProvider = ({ children }: Props) => {
 
               if (tempData.length === 0) {
                 setTimeout(() => {
-                  console.log("🚀 ~ tempData:", tempData.length);
+                  console.log(
+                    "🚀 ~ Numero de datos recibidos:",
+                    tempData.length
+                  );
 
                   if (tempData.length >= 54) setData((d) => [...d, tempData]);
 

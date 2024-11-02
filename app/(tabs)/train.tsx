@@ -1,4 +1,11 @@
-import { View, Text, Pressable, TextInput, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  Pressable,
+  TextInput,
+  ScrollView,
+  ActivityIndicator,
+} from "react-native";
 import TrainSvg from "@/svgs/Train";
 import CirculoSvg from "@/svgs/Marcos";
 import { router } from "expo-router";
@@ -9,10 +16,12 @@ import { useSessionContext } from "@/hooks/useSessionContext";
 const Train = () => {
   const [word, setWord] = useState("");
   const [error, setError] = useState("");
+  const [isFetching, setIsFetching] = useState(false);
   const { token, user } = useSessionContext();
   const { get } = useAPI();
 
   const handleSubmit = async () => {
+    setIsFetching(true);
     if (word.trim()) {
       setError("");
 
@@ -28,6 +37,7 @@ const Train = () => {
     } else {
       setError("Por favor ingresa una palabra");
     }
+    setIsFetching(false);
   };
 
   return (
@@ -102,9 +112,13 @@ const Train = () => {
             },
           ]}
         >
-          <Text className="w-72 text-center font-bold text-lg text-blue-800">
-            Iniciar entrenamiento
-          </Text>
+          {isFetching ? (
+            <ActivityIndicator size={24} color={"#006699"} />
+          ) : (
+            <Text className="w-72 text-center font-bold text-lg text-blue-800">
+              Iniciar entrenamiento
+            </Text>
+          )}
         </Pressable>
       </View>
     </ScrollView>
