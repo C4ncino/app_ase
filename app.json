@@ -37,11 +37,6 @@
         "android.permission.BLUETOOTH_CONNECT"
       ]
     },
-    "web": {
-      "favicon": "./src/assets/iconDark.png",
-      "output": "server",
-      "bundler": "metro"
-    },
     "plugins": [
       "expo-router",
       [
