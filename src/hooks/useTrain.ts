@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 
-import useAPI from "./useAPI";
-import useCountdown from "./useCountdown";
 import { messages } from "@/messages/train";
+
+import useAPI from "./useAPI";
+import useBase64 from "./useBase64";
+import useCountdown from "./useCountdown";
 import { useBleContext } from "./useBLEContext";
 import { useSessionContext } from "./useSessionContext";
-import useBase64 from "./useBase64";
 import { useModelsContext } from "./useModelsContext";
 
 const useTrain = (word: string) => {

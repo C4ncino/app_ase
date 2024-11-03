@@ -1,10 +1,12 @@
-import { View, Text, Pressable, Animated } from "react-native";
 import { router } from "expo-router";
-import TranslateSVG from "@/svgs/Translate";
-import MiraSvg from "@/svgs/Mira";
-import { useSessionContext } from "@/hooks/useSessionContext";
-import { Ionicons } from "@expo/vector-icons";
 import { useEffect, useRef } from "react";
+import { Ionicons } from "@expo/vector-icons";
+import { View, Text, Pressable, Animated } from "react-native";
+
+import MiraSvg from "@/svgs/Mira";
+import TranslateSVG from "@/svgs/Translate";
+
+import { useSessionContext } from "@/hooks/useSessionContext";
 
 const Home = () => {
   const { wordsCount, updateWordsCount } = useSessionContext();

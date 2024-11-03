@@ -1,5 +1,5 @@
-import * as React from "react";
 import Svg, { SvgProps, Defs, ClipPath, Path, G } from "react-native-svg";
+
 const MarcoSvg = (props: SvgProps) => (
   <Svg {...props} viewBox="0 0 1794 1795">
     <Defs>

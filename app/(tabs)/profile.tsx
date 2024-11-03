@@ -1,7 +1,8 @@
-import { View, Text, ScrollView } from "react-native";
-import { useSessionContext } from "@/hooks/useSessionContext";
-import ProfileSvg from "@/svgs/Profile";
 import { useEffect } from "react";
+import { View, Text, ScrollView } from "react-native";
+
+import ProfileSvg from "@/svgs/Profile";
+import { useSessionContext } from "@/hooks/useSessionContext";
 
 const Home = () => {
   const { user, wordsCount, updateWordsCount } = useSessionContext();

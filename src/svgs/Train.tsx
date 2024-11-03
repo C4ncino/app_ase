@@ -1,4 +1,3 @@
-import * as React from "react";
 import Svg, { SvgProps, Circle, Path, Ellipse } from "react-native-svg";
 
 const LoginSvg = (props: SvgProps) => (

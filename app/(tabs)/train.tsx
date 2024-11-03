@@ -6,10 +6,12 @@ import {
   ScrollView,
   ActivityIndicator,
 } from "react-native";
+import { useState } from "react";
+import { router } from "expo-router";
+
 import TrainSvg from "@/svgs/Train";
 import CirculoSvg from "@/svgs/Marcos";
-import { router } from "expo-router";
-import { useState } from "react";
+
 import useAPI from "@/hooks/useAPI";
 import { useSessionContext } from "@/hooks/useSessionContext";
 

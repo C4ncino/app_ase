@@ -1,7 +1,8 @@
-import { View, Text } from "react-native";
 import React from "react";
-import { useBleContext } from "@/hooks/useBLEContext";
+import { View, Text } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+
+import { useBleContext } from "@/hooks/useBLEContext";
 
 const BatteryLevel = () => {
   const { batteryLevel } = useBleContext();

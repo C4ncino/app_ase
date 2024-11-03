@@ -1,6 +1,7 @@
-import { View, Text, Pressable, StyleSheet } from "react-native";
-import CirculoSvg from "@/svgs/Marcos";
 import { Ionicons } from "@expo/vector-icons";
+import { View, Text, Pressable, StyleSheet } from "react-native";
+
+import CirculoSvg from "@/svgs/Marcos";
 
 interface Props {
   maxSamples: number;

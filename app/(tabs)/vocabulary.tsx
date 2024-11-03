@@ -7,10 +7,11 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Octicons, MaterialCommunityIcons } from "@expo/vector-icons";
 
 import useAPI from "@/hooks/useAPI";
+import { useNetworkContext } from "@/hooks/useNetworkContext";
 import { useSessionContext } from "@/hooks/useSessionContext";
+
 import TitleHeader from "@/components/Vocabulary/TitleHeader";
 import WordListItem from "@/components/Vocabulary/WordListItem";
-import { useNetworkContext } from "@/hooks/useNetworkContext";
 
 const Vocabulary = () => {
   const [wordsLists, setWordsLists] = useState<WordList[]>([]);

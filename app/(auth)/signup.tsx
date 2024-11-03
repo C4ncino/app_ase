@@ -1,22 +1,21 @@
-import SignUpSvg from "@/svgs/SignUp";
-import { Link, router } from "expo-router";
 import {
   View,
   Text,
   TextInput,
   Pressable,
-  StyleSheet,
   ScrollView,
   ActivityIndicator,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { useState } from "react";
+import { Link, router } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { FontAwesome5, Entypo, Fontisto } from "@expo/vector-icons";
-import DatePicker from "@/components/DatePicker";
-import { messages } from "@/messages/signupMessages";
+
+import SignUpSvg from "@/svgs/SignUp";
 import { emailRegex } from "@/utils/regex";
+import DatePicker from "@/components/auth/DatePicker";
+import { messages } from "@/messages/signupMessages";
 import { useSessionContext } from "@/hooks/useSessionContext";
-import sha256 from "crypto-js/sha256";
 
 const SignUp = () => {
   const [name, setName] = useState("");
@@ -26,27 +25,27 @@ const SignUp = () => {
   const [password, setPassword] = useState("");
   const [cpassword, setCPassword] = useState("");
   const [error, setError] = useState("");
-  const [isFecthing, setIsFecthing] = useState(false);
+  const [isFetching, setIsFetching] = useState(false);
 
   const { signUp, hash } = useSessionContext();
 
   const onSubmit = async () => {
-    setIsFecthing(true);
+    setIsFetching(true);
     if (!name || !lastName || !bday || !email || !password || !cpassword) {
-      setIsFecthing(false);
+      setIsFetching(false);
       setError(messages[0]);
       return;
     }
 
     if (!emailRegex.test(email)) {
       setError(messages[1]);
-      setIsFecthing(false);
+      setIsFetching(false);
       return;
     }
 
     if (password !== cpassword) {
       setError(messages[2]);
-      setIsFecthing(false);
+      setIsFetching(false);
       return;
     }
 
@@ -63,7 +62,7 @@ const SignUp = () => {
     }
 
     setError(messages[3]);
-    setIsFecthing(false);
+    setIsFetching(false);
   };
 
   return (
@@ -168,7 +167,7 @@ const SignUp = () => {
         )}
         <View className="items-center">
           <Pressable
-            // disabled={isFecthing}
+            disabled={isFetching}
             onPress={onSubmit}
             style={({ pressed }) => [
               {
@@ -187,7 +186,7 @@ const SignUp = () => {
               },
             ]}
           >
-            {isFecthing ? (
+            {isFetching ? (
               <ActivityIndicator size={24} color={"#006699"} />
             ) : (
               <View className="items-center">

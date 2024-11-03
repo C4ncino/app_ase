@@ -1,13 +1,15 @@
+import { useCallback } from "react";
 import { View, ScrollView, Text } from "react-native";
-import React, { useCallback } from "react";
+import { MaterialIcons } from "@expo/vector-icons";
 import { useFocusEffect, useLocalSearchParams } from "expo-router";
+
 import useTrain from "@/hooks/useTrain";
 import { useBleContext } from "@/hooks/useBLEContext";
+import { useNetworkContext } from "@/hooks/useNetworkContext";
+
+import NoGloveView from "@/components/ble/NoGloveview";
 import GettingData from "@/components/train/GettingData";
 import BackendStatus from "@/components/train/BackendStatus";
-import NoGloveview from "@/components/NoGloveview";
-import { useNetworkContext } from "@/hooks/useNetworkContext";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 const Training = () => {
   const { word } = useLocalSearchParams();
@@ -52,7 +54,7 @@ const Training = () => {
               )}
             </View>
           ) : (
-            <NoGloveview />
+            <NoGloveView />
           )}
         </>
       ) : (

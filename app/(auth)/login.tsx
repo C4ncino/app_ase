@@ -1,41 +1,41 @@
-import LoginSvg from "@/svgs/Login";
-import React, { useState } from "react";
-import { Link, router } from "expo-router";
 import {
   View,
   Text,
   TextInput,
-  StyleSheet,
   Pressable,
   ActivityIndicator,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import React, { useState } from "react";
+import { Link, router } from "expo-router";
 import { Fontisto, Entypo } from "@expo/vector-icons";
-import { useSessionContext } from "@/hooks/useSessionContext";
-import { errors } from "@/messages/loginMessages";
+import { SafeAreaView } from "react-native-safe-area-context";
+
+import LoginSvg from "@/svgs/Login";
 import { emailRegex } from "@/utils/regex";
+import { errors } from "@/messages/loginMessages";
+import { useSessionContext } from "@/hooks/useSessionContext";
 
 export default function Component() {
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
-  const [isFecthing, setIsFecthing] = useState(false);
+  const [isFetching, setIsFetching] = useState(false);
 
   const { login, hash } = useSessionContext();
 
   const handleLogin = async () => {
-    setIsFecthing(true);
+    setIsFetching(true);
     setError("");
 
     if (!email || !password) {
       setError(errors[0]);
-      setIsFecthing(false);
+      setIsFetching(false);
       return;
     }
 
     if (!emailRegex.test(email)) {
       setError(errors[1]);
-      setIsFecthing(false);
+      setIsFetching(false);
       return;
     }
 
@@ -43,7 +43,7 @@ export default function Component() {
 
     if (!success) {
       setError(errors[2]);
-      setIsFecthing(false);
+      setIsFetching(false);
       return;
     }
 
@@ -113,7 +113,7 @@ export default function Component() {
         )}
         <View className="justify-center items-center">
           <Pressable
-            disabled={isFecthing}
+            disabled={isFetching}
             onPress={handleLogin}
             style={({ pressed }) => [
               {
@@ -132,7 +132,7 @@ export default function Component() {
               },
             ]}
           >
-            {isFecthing ? (
+            {isFetching ? (
               <ActivityIndicator size={24} color={"#006699"} />
             ) : (
               <View className="items-center">

@@ -1,5 +1,5 @@
-import * as React from "react";
 import Svg, { SvgProps, G, Path } from "react-native-svg";
+
 const MiraSvg = (props: SvgProps) => (
   <Svg {...props} viewBox="0 0 1187 1187">
     <G fill="none" strokeMiterlimit={8} strokeWidth={6.875}>

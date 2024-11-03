@@ -1,4 +1,3 @@
-import * as React from "react";
 import Svg, { SvgProps, Path, Circle, G } from "react-native-svg";
 
 const ProfileSvg = (props: SvgProps) => (

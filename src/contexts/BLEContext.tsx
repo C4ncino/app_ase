@@ -7,7 +7,7 @@ import useBase64 from "@/hooks/useBase64";
 import { bleMessages } from "@/messages/bleMessages";
 
 import { PermissionsAndroid, Platform } from "react-native";
-import * as ExpoDevice from "expo-device";
+import { platformApiLevel } from "expo-device";
 
 export const BLEContext = createContext<BLEContextModel>({
   isConnected: false,
@@ -73,7 +73,7 @@ const BLEContextProvider = ({ children }: Props) => {
     };
 
     if (isConnected) updateReceiving();
-  }, [receiving]);
+  }, [receiving, isConnected]);
 
   const requestAndroid31Permissions = async () => {
     const bluetoothScanPermission = await PermissionsAndroid.request(
@@ -110,7 +110,7 @@ const BLEContextProvider = ({ children }: Props) => {
 
   const requestPermissions = async () => {
     if (Platform.OS === "android") {
-      if ((ExpoDevice.platformApiLevel ?? -1) < 31) {
+      if ((platformApiLevel ?? -1) < 31) {
         const granted = await PermissionsAndroid.request(
           PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
           {
@@ -234,10 +234,9 @@ const BLEContextProvider = ({ children }: Props) => {
                 return;
               }
 
-              // TODO:
-              // const level = decodeUInt(char.value);
+              const level = decodeUInt(char.value);
 
-              // if (level !== batteryLevel) setBatteryLevel(level);
+              if (level !== batteryLevel) setBatteryLevel(level);
             });
           });
 

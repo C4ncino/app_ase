@@ -1,10 +1,11 @@
-import { useBleContext } from "@/hooks/useBLEContext";
-import { bleMessages } from "@/messages/bleMessages";
 import { useState } from "react";
-import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
-import { View, Text, Modal, ActivityIndicator, Pressable } from "react-native";
-import BatteryLevel from "./BatteryLevel";
 import { Feather } from "@expo/vector-icons";
+import { FontAwesome6 } from "@expo/vector-icons";
+import { View, Text, Modal, ActivityIndicator, Pressable } from "react-native";
+
+import BatteryLevel from "./BatteryLevel";
+import { bleMessages } from "@/messages/bleMessages";
+import { useBleContext } from "@/hooks/useBLEContext";
 
 const DeviceLocalizer = () => {
   const [open, setOpen] = useState(false);

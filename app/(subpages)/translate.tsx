@@ -1,11 +1,12 @@
-import { View, Text, Pressable, ActivityIndicator } from "react-native";
 import { Entypo } from "@expo/vector-icons";
-import { useEffect, useCallback, useState } from "react";
-import { useBleContext } from "@/hooks/useBLEContext";
-import useCountdown from "@/hooks/useCountdown";
 import { useFocusEffect } from "expo-router";
+import { useEffect, useCallback, useState } from "react";
+import { View, Text, Pressable, ActivityIndicator } from "react-native";
+
+import useCountdown from "@/hooks/useCountdown";
+import NoGloveView from "@/components/ble/NoGloveview";
 import { useTranslate } from "@/hooks/useTranslate";
-import NoGloveview from "@/components/NoGloveview";
+import { useBleContext } from "@/hooks/useBLEContext";
 
 const Translate = () => {
   const { isConnected, setReceiving, setData, data } = useBleContext();
@@ -128,7 +129,7 @@ const Translate = () => {
           </View>
         </View>
       ) : (
-        <NoGloveview />
+        <NoGloveView />
       )}
     </View>
   );

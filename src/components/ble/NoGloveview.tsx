@@ -1,7 +1,7 @@
 import { View, Text } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
-const NoGloveview = () => {
+const NoGloveView = () => {
   return (
     <View className="justify-center items-center w-full mt-72 mb-4">
       <MaterialCommunityIcons
@@ -14,4 +14,4 @@ const NoGloveview = () => {
   );
 };
 
-export default NoGloveview;
+export default NoGloveView;

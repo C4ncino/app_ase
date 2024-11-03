@@ -1,13 +1,15 @@
-import { View, Text, Pressable } from "react-native";
-import React from "react";
 import {
   Feather,
   FontAwesome6,
   Ionicons,
   MaterialCommunityIcons,
 } from "@expo/vector-icons";
-import ChainedIcons from "../Icons";
+
+import React from "react";
 import { router } from "expo-router";
+import { View, Text, Pressable } from "react-native";
+
+import ChainedIcons from "./Icons";
 
 interface Props {
   state: number;
