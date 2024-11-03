@@ -66,7 +66,9 @@ const DeviceLocalizer = () => {
                 )}
               </>
             ) : (
-              <FontAwesome6 name="circle-check" size={72} color="green" />
+              <View className="-mb-2">
+                <FontAwesome6 name="circle-check" size={72} color="green" />
+              </View>
             )}
           </View>
 

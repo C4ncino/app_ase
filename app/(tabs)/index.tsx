@@ -116,10 +116,10 @@ const Home = () => {
               position: "absolute",
               bottom: 0,
               left: "33.33%",
-              transform: [{ translateX: -8 }, { translateY: bounceValue }],
+              transform: [{ translateX: -1 }, { translateY: bounceValue }],
             }}
           >
-            <Ionicons name="arrow-down" size={40} color="#006699" />
+            <Ionicons name="arrow-down" size={34} color="#006699" />
           </Animated.View>
         </View>
       )}
