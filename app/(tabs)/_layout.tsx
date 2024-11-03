@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
-import DeviceLocalizer from "@/components/DeviceLocalizer";
+import DeviceLocalizer from "@/components/ble/DeviceLocalizer";
 import { Tabs } from "expo-router";
 import { Text } from "react-native";
 import LogoutButton from "@/components/auth/LogoutButton";

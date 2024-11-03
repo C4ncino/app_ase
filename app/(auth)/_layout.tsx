@@ -1,6 +1,6 @@
 import React from "react";
-import { StyleSheet } from "react-native";
 import { Stack } from "expo-router";
+import { StyleSheet } from "react-native";
 
 const Layout = () => {
   return (

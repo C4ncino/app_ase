@@ -1,4 +1,4 @@
-import DeviceLocalizer from "@/components/DeviceLocalizer";
+import DeviceLocalizer from "@/components/ble/DeviceLocalizer";
 import { Stack } from "expo-router";
 import { Text } from "react-native";
 
