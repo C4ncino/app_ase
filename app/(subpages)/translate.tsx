@@ -1,4 +1,4 @@
-import { View, Text, Pressable } from "react-native";
+import { View, Text, Pressable, ActivityIndicator } from "react-native";
 import { Entypo } from "@expo/vector-icons";
 import { useEffect, useCallback, useState } from "react";
 import { useBleContext } from "@/hooks/useBLEContext";
@@ -14,6 +14,7 @@ const Translate = () => {
     () => setReceiving(false)
   );
   const [message, setMessage] = useState("");
+  const [isTranslating, setIsTranslating] = useState(false);
   const { translate } = useTranslate(setMessage);
 
   useFocusEffect(
@@ -26,15 +27,38 @@ const Translate = () => {
     }, [isConnected])
   );
 
-  useEffect(() => {
+  const tryTranslate = async () => {
     if (data.length === 0) return;
 
-    // const currentMovement = data.shift();
+    console.log("🚀 ~ tryTranslate ~ data:", data.length);
 
-    // if (!currentMovement) return;
+    for (let i = 0; i < data.length; i++) {
+      // const currentMovement = data.shift();
 
-    // translate(currentMovement);
-  }, [data]);
+      // if (!currentMovement) break;
+
+      await translate(data[i]);
+    }
+
+    setData([]);
+
+    setIsTranslating(false);
+  };
+
+  useEffect(() => {
+    if (!isTranslating) return;
+    tryTranslate();
+  }, [isTranslating]);
+
+  const onStart = () => {
+    setData([]);
+    start();
+  };
+
+  const onStop = () => {
+    pause();
+    setIsTranslating(true);
+  };
 
   return (
     <View className="w-full h-full items-center bg-blue-40 py-16 px-0">
@@ -42,20 +66,21 @@ const Translate = () => {
         <View className="items-center">
           <View className="mx-9 bg-blue-30 items-center py-4 rounded-3xl relative w-80 h-5/6">
             <Text className="text-xl text-gray-400 mt-2 mb-2">
-              {isCounting || counter === 0 ? "Traduciendo" : ""}
+              {isTranslating ? "Traduciendo" : ""}
             </Text>
             <View className="flex-1 px-4 mt-2">
               <Text className="text-justify text-lg">{message}</Text>
             </View>
+            {isTranslating && <ActivityIndicator size={40} color={"#006699"} />}
             {isCounting && counter > 0 && (
-              <Text className="text-6xl  text-gray-600 ">{counter}</Text>
+              <Text className="text-6xl text-gray-600">{counter}</Text>
             )}
           </View>
 
           <View className="flex flex-row mt-4">
             {!isCounting ? (
               <Pressable
-                onPress={start}
+                onPress={onStart}
                 style={({ pressed }) => [
                   {
                     marginTop: pressed ? 12 : 8,
@@ -80,8 +105,7 @@ const Translate = () => {
               </Pressable>
             ) : (
               <Pressable
-                // className="w-24 h-24 justify-center rounded-full bg-white items-center"
-                onPress={pause}
+                onPress={onStop}
                 style={({ pressed }) => [
                   {
                     marginTop: pressed ? 12 : 8,

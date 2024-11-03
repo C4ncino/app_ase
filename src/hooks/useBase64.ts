@@ -62,8 +62,6 @@ const useBase64 = () => {
       decodeData.push([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]);
     }
 
-    console.log("🚀 ~ decodeForTranslate ~ decodeData:", decodeData.length);
-
     return decodeData;
   };
 

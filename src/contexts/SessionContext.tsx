@@ -36,69 +36,56 @@ const SessionContextProvider = ({ children }: Props) => {
   useEffect(() => {
     if (!isConnected || !user || !token) return;
 
+    lookForConnection();
+
     const fetchModels = async () => {
-      if (!largeModel) return;
+      const date = new Date();
+      const dateStr = `${date.getDate()}-${date.getMonth()}-${date.getFullYear()} 00:00:00`;
 
       const response = await post(
-        "models/check-version/" + user?.id,
+        "models/check_version/" + user?.id,
         JSON.stringify({
-          date: largeModel?.last_update,
+          date: largeModel ? largeModel.last_update : dateStr,
+          small: smallModels ? smallModels : {},
         }),
         token
       );
 
-      if (response && !response.updated) {
-        console.log("new large model");
+      if (!response) return;
+      if (response.large_updated && response.small_updated) return;
 
-        const modelPath = await saveModel(
-          response.model.model,
+      if (!response.large_updated) {
+        const filePath = await saveModel(
+          response.latest_model.model,
           "generalModel/"
         );
 
         setLargeModel({
-          model_path: modelPath,
-          last_update: response.model.last_update,
+          model_path: filePath,
+          last_update: response.latest_model.last_update,
         });
       }
 
-      const modelsCount = Object.keys(smallModels).length;
-      console.log("🚀 ~ fetchModels ~ modelsCount:", modelsCount);
-
-      if (modelsCount === wordsCount) return;
-
-      for (let i = 0; i < modelsCount; i++) {
-        if (smallModels[i]) continue;
-
-        console.log("Fetching model: ", i);
-
-        const response = await get("words/get-class-key/" + i, token);
-
-        if (response) {
-          const word = response.word;
-
-          const modelPath = await saveModel(
-            response.model,
-            `${word.class_key}/`
-          );
-
+      if (!response.small_updated) {
+        for (const model of response.small_models) {
+          const filePath = await saveModel(model.model, `${model.class_key}/`);
           addSmallModel(
             {
-              meaning: word.word,
-              model_path: modelPath,
+              meaning: model.word,
+              model_path: filePath,
             },
-            word.class_key
+            model.class_key
           );
         }
       }
     };
 
-    // fetchModels();
-  }, [isConnected, user, token]);
+    fetchModels();
+  }, [isConnected, user, token, smallModels, largeModel]);
 
   useEffect(() => {
     const getToken = async () => {
       const token = await AsyncStorage.getItem("token");
-      console.log(token);
 
       if (!token) {
         await logout();

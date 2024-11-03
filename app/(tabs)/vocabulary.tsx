@@ -10,12 +10,14 @@ import useAPI from "@/hooks/useAPI";
 import { useSessionContext } from "@/hooks/useSessionContext";
 import TitleHeader from "@/components/Vocabulary/TitleHeader";
 import WordListItem from "@/components/Vocabulary/WordListItem";
+import { useNetworkContext } from "@/hooks/useNetworkContext";
 
 const Vocabulary = () => {
   const [wordsLists, setWordsLists] = useState<WordList[]>([]);
 
   const { get } = useAPI();
   const { user, token, refresh } = useSessionContext();
+  const { lookForConnection } = useNetworkContext();
 
   useFocusEffect(
     useCallback(() => {
@@ -23,6 +25,10 @@ const Vocabulary = () => {
         const dbWords = await AsyncStorage.getItem("words");
 
         if (dbWords && dbWords !== "[]") setWordsLists(JSON.parse(dbWords));
+
+        const hasConnection = await lookForConnection();
+
+        if (!hasConnection) return;
 
         if (!user && !token) router.replace("/login");
 

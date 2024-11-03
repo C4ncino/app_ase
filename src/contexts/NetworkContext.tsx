@@ -5,7 +5,7 @@ interface Props extends PropsWithChildren {}
 
 export const NetworkContext = createContext<NetworkContextModel>({
   isConnected: false,
-  lookForConnection: () => {},
+  lookForConnection: () => Promise.resolve(false),
 });
 
 const NetworkContextProvider = ({ children }: Props) => {
@@ -17,9 +17,13 @@ const NetworkContextProvider = ({ children }: Props) => {
 
   const lookForConnection = async () => {
     const { type } = await getNetworkStateAsync();
-    setIsConnected(
-      type === NetworkStateType.WIFI || type === NetworkStateType.VPN
-    );
+
+    const hasConnection =
+      type === NetworkStateType.WIFI || type === NetworkStateType.VPN;
+
+    setIsConnected(hasConnection);
+
+    return hasConnection;
   };
 
   const networkContext: NetworkContextModel = {

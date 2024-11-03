@@ -1,4 +1,11 @@
-import { PropsWithChildren, createContext, useState, useEffect } from "react";
+import {
+  PropsWithChildren,
+  createContext,
+  useState,
+  useEffect,
+  useMemo,
+  useCallback,
+} from "react";
 import {
   documentDirectory,
   makeDirectoryAsync,
@@ -19,30 +26,29 @@ import {
   ModelsContextModel,
 } from "@/types/modelsContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import useAPI from "@/hooks/useAPI";
+import { Buffer } from "buffer";
 
 export const ModelsContext = createContext<ModelsContextModel>({
   largeModel: undefined,
-  smallModels: {},
+  smallModels: undefined,
   saveModel: () => Promise.resolve(""),
 
   setLargeModel: () => {},
   addSmallModel: () => {},
 
-  getLargeModel: () => Promise.resolve(undefined),
   getSmallModel: () => Promise.resolve(undefined),
 
   getMeaning: () => "",
+
+  memorizedLargeModel: Promise.resolve(undefined),
 });
 
 interface Props extends PropsWithChildren {}
 
 const ModelsContextProvider = ({ children }: Props) => {
   const [largeModel, setLargeModel] = useState<LargeModel>();
-  const [smallModels, setSmallModels] = useState<Models>({});
+  const [smallModels, setSmallModels] = useState<Models>();
   const baseDir = documentDirectory + "models/";
-
-  const { post } = useAPI();
 
   async function logAllFilesInDirectory(directoryUri: string) {
     try {
@@ -52,11 +58,8 @@ const ModelsContextProvider = ({ children }: Props) => {
         const fileUri = `${directoryUri}/${file}`;
         const fileInfo = await getInfoAsync(fileUri);
 
-        if (fileInfo.isDirectory) {
-          await logAllFilesInDirectory(fileUri);
-        } else {
-          console.log("File:", fileUri);
-        }
+        if (fileInfo.isDirectory) await logAllFilesInDirectory(fileUri);
+        else console.log("🚀 ~ logAllFilesInDirectory ~ fileUri:", fileUri);
       }
     } catch (error) {
       console.error("Error reading directory:", error);
@@ -65,7 +68,7 @@ const ModelsContextProvider = ({ children }: Props) => {
 
   useEffect(() => {
     createDir("models");
-    logAllFilesInDirectory(baseDir);
+    // logAllFilesInDirectory(baseDir);
 
     const loadModelsInfo = async () => {
       await ready();
@@ -82,38 +85,18 @@ const ModelsContextProvider = ({ children }: Props) => {
 
   useEffect(() => {
     console.log("🚀 ~ ModelsContextProvider ~ largeModel:", largeModel);
+    if (!largeModel) return;
 
     const saveLargeModel = async () => {
-      const response = await post(
-        "models/check_version/1",
-        JSON.stringify({
-          date: "30-10-2024 00:00:00",
-        })
-      );
-
-      if (!response) return;
-
-      console.log(
-        "🚀 ~ ModelsContextProvider ~ saveLargeModel ~ response:",
-        response.latest_model.model
-      );
-      const modelPath = await saveModel(
-        response.latest_model.model,
-        "generalModel"
-      );
-      console.log("🚀 ~ saveLargeModel ~ modelPath:", modelPath);
-
-      if (!largeModel) return;
-      largeModel.model_path =
-        "file:///data/user/0/com.tr.ibero/files/models//generalModel/";
       await AsyncStorage.setItem("largeModel", JSON.stringify(largeModel));
     };
 
     saveLargeModel();
-  }, []);
+  }, [largeModel]);
 
   useEffect(() => {
     console.log("🚀 ~ saveSmallModels ~ smallModels:", smallModels);
+    if (!smallModels) return;
 
     const saveSmallModels = async () => {
       await AsyncStorage.setItem("smallModels", JSON.stringify(smallModels));
@@ -163,18 +146,27 @@ const ModelsContextProvider = ({ children }: Props) => {
     }
   };
 
-  const addSmallModel = (model: Model, id: number) => {
-    setSmallModels({ ...smallModels, [id]: model });
+  const addSmallModel = (model: Model, id: number) =>
+    setSmallModels((previous) => {
+      if (!previous) return { [id]: model };
+      previous[id] = model;
+      return previous;
+    });
+
+  const readBinaryFile = async (filePath: string) => {
+    const base64String = await readAsStringAsync(filePath, {
+      encoding: EncodingType.Base64,
+    });
+
+    const buffer = Buffer.from(base64String, "base64");
+
+    const arrayBuffer = buffer.buffer;
+
+    return arrayBuffer;
   };
 
-  const load = async (modelPath: string) => {
-    console.log("🚀 ~ load ~ modelPath:", modelPath);
-    const files = await readDirectoryAsync(modelPath);
-
-    console.log("🚀 ~ load ~ files:", files);
-
-    const jsonFile = modelPath + "model.json";
-    const binFile = modelPath + "mi_modelo_gru.weights.bin";
+  const load = useCallback(async (modelPath?: string) => {
+    if (!modelPath) return;
 
     const modelJson = await readAsStringAsync(modelPath + "model.json", {
       encoding: EncodingType.UTF8,
@@ -182,36 +174,24 @@ const ModelsContextProvider = ({ children }: Props) => {
 
     const data = JSON.parse(modelJson);
 
-    const weights = await readAsStringAsync(
-      modelPath + "mi_modelo_gru.weights.bin",
-      {
-        encoding: EncodingType.Base64,
-      }
-    );
+    const manifest = data["weightsManifest"][0].weights;
 
-    const model2 = await loadLayersModel(data);
+    const model = await loadLayersModel(io.fromMemory(data));
 
-    console.log("🚀 ~ load ~ model2:", JSON.stringify(model2.summary()));
-    const layers = model2.layers;
-    layers.forEach((layer) => {
-      const weights = layer.getWeights();
-      console.log(`Layer: ${layer.name}, Weights:`, weights);
-    });
+    const arrayBuffer = await readBinaryFile(modelPath + "weights.bin");
 
-    // console.log("🚀 ~ load ~ model:", model);
+    const weithsInfo = io.decodeWeights(arrayBuffer, manifest);
 
-    // model.setWeights
+    const weightsTensor = Object.values(weithsInfo);
 
-    return model2;
-  };
+    model.setWeights(weightsTensor);
 
-  const getLargeModel = async () => {
-    if (!largeModel) return undefined;
-
-    return await load(largeModel.model_path);
-  };
+    return model;
+  }, []);
 
   const getSmallModel = async (id: number) => {
+    if (!smallModels) return undefined;
+
     const modelInfo = smallModels[id];
 
     if (!modelInfo) return undefined;
@@ -219,7 +199,12 @@ const ModelsContextProvider = ({ children }: Props) => {
     return await load(modelInfo.model_path);
   };
 
-  const getMeaning = (id: number) => smallModels[id].meaning;
+  const getMeaning = (id: number) =>
+    smallModels ? smallModels[id].meaning : "";
+
+  const memorizedLargeModel = useMemo(() => {
+    return load(largeModel?.model_path);
+  }, [largeModel, load]);
 
   const modelsContext: ModelsContextModel = {
     smallModels,
@@ -227,9 +212,9 @@ const ModelsContextProvider = ({ children }: Props) => {
     saveModel,
     setLargeModel,
     addSmallModel,
-    getLargeModel,
     getSmallModel,
     getMeaning,
+    memorizedLargeModel,
   };
 
   return (

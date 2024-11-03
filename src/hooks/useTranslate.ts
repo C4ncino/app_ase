@@ -1,4 +1,4 @@
-import { Tensor2D, tensor2d, Tensor, Rank, tidy } from "@tensorflow/tfjs";
+import { tensor, Tensor, Rank, tidy } from "@tensorflow/tfjs";
 import useBase64 from "./useBase64";
 import { useModelsContext } from "./useModelsContext";
 
@@ -6,55 +6,27 @@ export const useTranslate = (
   setMessage: React.Dispatch<React.SetStateAction<string>>
 ) => {
   const { decodeForTranslate } = useBase64();
-  const { getLargeModel, getSmallModel, getMeaning } = useModelsContext();
+  const { memorizedLargeModel, getSmallModel, getMeaning } = useModelsContext();
   const threshold = 0.5;
 
   const getInput = (rawData: RawMovement) => {
     const data = decodeForTranslate(rawData);
 
-    console.log(data.length);
-
-    return tensor2d(data, [60, 8], "float32");
+    return tensor([data], [1, 60, 8]);
   };
 
-  const flatResult = async (result: Tensor<Rank> | Tensor<Rank>[]) => {
-    let predictions: Uint8Array | Float32Array | Int32Array;
-
-    if (Array.isArray(result)) {
-      const predictionsArray = await Promise.all(
-        result.map((tensor) => tensor.dataSync())
-      );
-
-      const flattened = predictionsArray.flat();
-
-      predictions = new Float32Array(flattened.length);
-
-      let offset = 0;
-      predictionsArray.forEach((arr) => {
-        predictions.set(arr as Float32Array, offset);
-        offset += arr.length;
-      });
-    } else {
-      predictions = await result.data();
-    }
-
-    return predictions;
-  };
-
-  const getLargePredictions = async (input: Tensor2D) => {
-    const model = await getLargeModel();
-
-    console.log("🚀 ~ getLargePredictions ~ model:", model);
+  const getLargePredictions = async (input: Tensor) => {
+    const model = await memorizedLargeModel;
 
     if (!model) return;
 
-    const result = tidy(() => model.predict(input));
-
-    console.log("🚀 ~ getLargePredictions ~ result:", result);
+    const result = tidy(() => model.predict(input) as Tensor<Rank>);
 
     if (!result) return;
 
-    const predictions = await flatResult(result);
+    const predictions = result.dataSync();
+
+    result.dispose();
 
     const highestPrediction = predictions
       .map((prob, index) => (prob > threshold ? index : -1))
@@ -63,22 +35,26 @@ export const useTranslate = (
     return highestPrediction;
   };
 
-  const getSmallPrediction = async (input: Tensor2D, class_key: number) => {
+  const getSmallPrediction = async (input: Tensor, class_key: number) => {
     const model = await getSmallModel(class_key);
 
-    const result = tidy(() => model?.predict(input));
+    if (!model) return;
+
+    const result = tidy(() => model.predict(input) as Tensor<Rank>);
+
+    model.dispose();
 
     if (!result) return;
 
-    const predictions = await flatResult(result);
+    const predictions = result.dataSync();
+
+    result.dispose();
 
     return predictions[0];
   };
 
   const translate = async (rawData: RawMovement): Promise<void> => {
     const tensor = getInput(rawData);
-
-    console.log("🚀 ~ translate ~ tensor:", tensor);
 
     const predictions = await getLargePredictions(tensor);
 
@@ -101,6 +77,8 @@ export const useTranslate = (
         bestIndex = prediction;
       }
     }
+
+    tensor.dispose();
 
     if (best === -1) return;
 

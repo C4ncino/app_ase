@@ -1,4 +1,4 @@
 type NetworkContextModel = {
   isConnected: boolean;
-  lookForConnection: () => void;
+  lookForConnection: () => Promise<boolean>;
 };

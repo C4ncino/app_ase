@@ -36,7 +36,7 @@ const BLEContextProvider = ({ children }: Props) => {
   const [receiving, setReceiving] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
 
-  const { decodeUInt, decode, encodeBool } = useBase64();
+  const { decodeUInt, encodeBool } = useBase64();
 
   const {
     blePrefix,
@@ -234,6 +234,7 @@ const BLEContextProvider = ({ children }: Props) => {
                 return;
               }
 
+              // TODO:
               // const level = decodeUInt(char.value);
 
               // if (level !== batteryLevel) setBatteryLevel(level);
@@ -249,8 +250,6 @@ const BLEContextProvider = ({ children }: Props) => {
   };
 
   const forget = async (setMessage?: StringSetter) => {
-    console.log(data.map((d) => d.map((dd) => decode(dd))));
-
     setMacAddress("");
     setData([]);
     await AsyncStorage.removeItem("mac");

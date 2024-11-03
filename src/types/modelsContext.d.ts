@@ -23,16 +23,17 @@ interface LargeModel extends Model {
 type Models = Record<ClassKey, Model>;
 
 type ModelsContextModel = {
-  largeModel: LargeModel | undefined;
-  smallModels: Models;
+  largeModel?: LargeModel;
+  smallModels?: Models;
 
   saveModel: (modelData: ModelData, dirName: string) => Promise<string>;
 
   setLargeModel: React.Dispatch<React.SetStateAction<LargeModel | undefined>>;
   addSmallModel: (model: Model, id: number) => void;
 
-  getLargeModel: () => Promise<LayersModel | undefined>;
   getSmallModel: (id: number) => Promise<LayersModel | undefined>;
 
   getMeaning: (id: number) => string | undefined;
+
+  memorizedLargeModel: Promise<LayersModel | undefined>;
 };

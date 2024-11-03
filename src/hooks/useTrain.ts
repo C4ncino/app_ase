@@ -77,9 +77,11 @@ const useTrain = (word: string) => {
       if (response && response.ready) {
         const bad_samples = response.result.bad_samples;
 
+        const currentData = data.filter((_, i) => !bad_samples.includes(i));
+
         setData((d) => d.filter((_, i) => !bad_samples.includes(i)));
 
-        if (data.length - bad_samples.length < 15) {
+        if (currentData.length - bad_samples.length < 15) {
           setState(6);
           clearInterval(intervalId);
           return;
@@ -95,7 +97,7 @@ const useTrain = (word: string) => {
               radius: response.result.radius,
               threshold: response.result.threshold,
             },
-            sensor_data: decodeGloveData(data),
+            sensor_data: decodeGloveData(currentData),
           }),
           token
         );
@@ -127,7 +129,7 @@ const useTrain = (word: string) => {
               meaning: response.word.word,
               model_path: modelPath,
             },
-            response.word.id
+            response.word.class_key
           );
 
           setState(3);
