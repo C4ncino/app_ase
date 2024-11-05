@@ -1,7 +1,13 @@
 import { Entypo } from "@expo/vector-icons";
 import { useFocusEffect } from "expo-router";
 import { useEffect, useCallback, useState } from "react";
-import { View, Text, Pressable, ActivityIndicator } from "react-native";
+import {
+  View,
+  Text,
+  Pressable,
+  ActivityIndicator,
+  TextInput,
+} from "react-native";
 
 import useCountdown from "@/hooks/useCountdown";
 import NoGloveView from "@/components/ble/NoGloveview";
@@ -33,13 +39,7 @@ const Translate = () => {
 
     console.log("🚀 ~ tryTranslate ~ data:", data.length);
 
-    for (let i = 0; i < data.length; i++) {
-      // const currentMovement = data.shift();
-
-      // if (!currentMovement) break;
-
-      await translate(data[i]);
-    }
+    for (let i = 0; i < data.length; i++) await translate(data[i]);
 
     setData([]);
 
@@ -70,12 +70,14 @@ const Translate = () => {
               {isTranslating ? "Traduciendo" : ""}
             </Text>
             <View className="flex-1 px-4 mt-2">
-              <Text className="text-justify text-lg">{message}</Text>
+              <TextInput multiline value={message} onChangeText={setMessage} />
+              {/* <Text className="text-justify text-lg">{message}</Text> */}
             </View>
             {isTranslating && <ActivityIndicator size={40} color={"#006699"} />}
             {isCounting && counter > 0 && (
               <Text className="text-6xl text-gray-600">{counter}</Text>
             )}
+            {counter === 0 && !isTranslating && <Text>Getting Data</Text>}
           </View>
 
           <View className="flex flex-row mt-4">

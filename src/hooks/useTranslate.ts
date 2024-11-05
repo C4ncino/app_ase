@@ -1,4 +1,4 @@
-import { tensor, Tensor, Rank, tidy } from "@tensorflow/tfjs";
+import { tensor, Tensor, Rank, tidy, engine } from "@tensorflow/tfjs";
 
 import useBase64 from "./useBase64";
 import { useModelsContext } from "./useModelsContext";
@@ -26,6 +26,8 @@ export const useTranslate = (
     if (!result) return;
 
     const predictions = result.dataSync();
+
+    console.log("🚀 ~ getLargePredictions ~ predictions:", predictions);
 
     result.dispose();
 
@@ -59,6 +61,8 @@ export const useTranslate = (
 
     const predictions = await getLargePredictions(tensor);
 
+    engine().startScope();
+
     console.log("🚀 ~ translate ~ predictions:", predictions);
 
     if (!predictions) return;
@@ -71,19 +75,25 @@ export const useTranslate = (
 
       console.log("🚀 ~ translate ~ smallPrediction:", smallPrediction);
 
-      if (!smallPrediction) continue;
+      if (!smallPrediction) return;
 
       if (smallPrediction > best) {
         best = smallPrediction;
         bestIndex = prediction;
       }
+      setTimeout(() => {}, 1000);
     }
 
     tensor.dispose();
 
+    engine().endScope();
+
     if (best === -1) return;
+    if (best < 0.5) return;
 
     setMessage((m) => `${m} ${getMeaning(bestIndex)}`);
+
+    setTimeout(() => {}, 1000);
   };
 
   return {
