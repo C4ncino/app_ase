@@ -23,7 +23,6 @@ const DeviceLocalizer = () => {
   return (
     <>
       <View className="mx-4">
-        {/* Muestra el botón "Conectar" solo si no está conectado */}
         {!isConnected ? (
           <Pressable
             className="bg-blue-600 rounded-full w-24 h-10 items-center justify-center"
@@ -77,7 +76,6 @@ const DeviceLocalizer = () => {
 
           {message && message === bleMessages[6] ? (
             <Pressable
-              // className="mt-10 w-48 h-14 rounded-full justify-center items-center border-2 border-blue-600 "
               onPress={onOpen}
               style={({ pressed }) => [
                 {
@@ -103,7 +101,6 @@ const DeviceLocalizer = () => {
             </Pressable>
           ) : (
             <Pressable
-              // className={`mt-10 w-48 h-14 rounded-full justify-center items-center ${message === bleMessages[0] || isConnected ? "border-2 border-gray-600 " : "border-2 border-blue-600 "}`}
               onPress={() => connect(setMessage)}
               disabled={message === bleMessages[0]}
               style={({ pressed }) => [
@@ -138,7 +135,6 @@ const DeviceLocalizer = () => {
             </Pressable>
           )}
           <Pressable
-            // className={`mt-4 w-48 h-14 rounded-full justify-center items-center ${!isConnected ? "border-2 border-gray-600 " : "border-2 border-red-400 "}`}
             onPress={() => forget(setMessage)}
             disabled={!isConnected}
             style={({ pressed }) => [

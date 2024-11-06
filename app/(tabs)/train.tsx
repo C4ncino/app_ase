@@ -35,15 +35,16 @@ const Train = () => {
     if (word.trim()) {
       setError("");
 
-      const response = await get(
-        `words/exists/${user?.id}/${word.toLowerCase()}`,
-        token
-      );
+      // const response = await get(
+      //   `words/exists/${user?.id}/${word.toLowerCase()}`,
+      //   token
+      // );
 
-      if (!response) setError("Hubo un problema de conexión");
+      // if (!response) setError("Hubo un problema de conexión");
 
-      if (!response.exists) router.push(`/training?word=${word.toLowerCase()}`);
-      else setError("La palabra ya existe");
+      // if (!response.exists)
+      router.push(`/training?word=${word.toLowerCase()}`);
+      // else setError("La palabra ya existe");
     } else {
       setError("Por favor ingresa una palabra");
     }

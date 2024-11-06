@@ -3,7 +3,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 const NoGloveView = () => {
   return (
-    <View className="justify-center items-center w-full mt-72 mb-4">
+    <View className="justify-center items-center w-full pb-32">
       <MaterialCommunityIcons
         name="alert-octagon-outline"
         size={72}

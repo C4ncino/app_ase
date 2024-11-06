@@ -24,8 +24,8 @@ const Training = () => {
 
   return (
     <ScrollView
-      contentContainerStyle={{ justifyContent: "center" }}
-      className="w-full  h-full bg-blue-40"
+      contentContainerStyle={{ justifyContent: "center", height: "100%" }}
+      className="bg-blue-40"
     >
       {isConnected ? (
         <View className="items-center bg-blue-40 w-full h-full py-6 px-6">
