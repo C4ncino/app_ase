@@ -27,3 +27,13 @@ https://github.com/software-mansion/react-native-gesture-handler#readme
 | INSTANCE | Characteristic | 7f506c74-66e8-48f0-9a4a-a44248bccf35 |
 | BAT      | Service        | 0x180F                               |
 | PCT      | Characteristic | 0x2A19                               |
+
+
+## Build
+
+```bash
+cd android
+./gradlew assembleDebug
+npm run build
+cd ..
+```
