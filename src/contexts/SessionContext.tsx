@@ -1,4 +1,5 @@
 import { router } from "expo-router";
+import sha256 from "crypto-js/sha256";
 import React, { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -6,7 +7,6 @@ import useAPI from "@/hooks/useAPI";
 import { useBleContext } from "@/hooks/useBLEContext";
 import { useModelsContext } from "@/hooks/useModelsContext";
 import { useNetworkContext } from "@/hooks/useNetworkContext";
-import sha256 from "crypto-js/sha256";
 
 export const SessionContext = React.createContext<SessionContextModel>({
   wordsCount: 0,
@@ -102,7 +102,6 @@ const SessionContextProvider = ({ children }: Props) => {
     };
 
     if (!isConnected) return;
-
     getToken();
   }, [isConnected]);
 

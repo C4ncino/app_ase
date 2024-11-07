@@ -1,10 +1,14 @@
 import axios, { AxiosResponse } from "axios";
+import useFirebase from "./useFirebase";
 
 const useAPI = () => {
-  const get_endpoint = (end_point: string) => {
-    const api_url = process.env.EXPO_PUBLIC_API_URL;
+  const { url, getValue } = useFirebase();
 
-    return api_url + end_point;
+  const get_endpoint = async (end_point: string) => {
+    if (url) return url + end_point;
+
+    const new_url = await getValue();
+    return new_url + end_point;
   };
 
   const validate = (status: number) => {
@@ -23,7 +27,7 @@ const useAPI = () => {
   };
 
   const get = async (end_point: string, token?: string) => {
-    const response = await axios.get(get_endpoint(end_point), {
+    const response = await axios.get(await get_endpoint(end_point), {
       headers: {
         Authorization: "Bearer " + token,
       },
@@ -34,7 +38,7 @@ const useAPI = () => {
   };
 
   const post = async (end_point: string, body: string, token?: string) => {
-    const response = await axios.post(get_endpoint(end_point), body, {
+    const response = await axios.post(await get_endpoint(end_point), body, {
       headers: {
         Authorization: "Bearer " + token,
         "Content-Type": "application/json",
@@ -46,7 +50,7 @@ const useAPI = () => {
   };
 
   const put = async (end_point: string, body: string, token?: string) => {
-    const response = await axios.put(get_endpoint(end_point), body, {
+    const response = await axios.put(await get_endpoint(end_point), body, {
       headers: {
         Authorization: "Bearer " + token,
         "Content-Type": "application/json",
@@ -58,7 +62,7 @@ const useAPI = () => {
   };
 
   const del = async (end_point: string, token?: string) => {
-    const response = await axios.delete(get_endpoint(end_point), {
+    const response = await axios.delete(await get_endpoint(end_point), {
       headers: {
         Authorization: "Bearer " + token,
       },
