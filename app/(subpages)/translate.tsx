@@ -104,11 +104,17 @@ const Translate = () => {
               numberOfLines={isWriting ? 16 : 28}
               className="w-full text-justify px-6 py-2"
             />
-            {isTranslating && <ActivityIndicator size={40} color={"#006699"} />}
-            {isCounting && counter > 0 && (
-              <Text className="text-6xl text-gray-600">{counter}</Text>
-            )}
-            {counter === 0 && !isTranslating && <Text>Getting Data</Text>}
+            <View className="absolute bottom-2">
+              {isTranslating && (
+                <ActivityIndicator size={40} color={"#006699"} />
+              )}
+              {isCounting && counter > 0 && (
+                <Text className="text-6xl text-gray-600">{counter}</Text>
+              )}
+              {counter === 0 && !isTranslating && (
+                <Text className="text-xl text-gray-600">Recibiendo Datos</Text>
+              )}
+            </View>
           </View>
 
           <View className="flex flex-row mt-4">

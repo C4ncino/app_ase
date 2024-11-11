@@ -75,6 +75,7 @@ const ModelsContextProvider = ({ children }: Props) => {
 
       const largeModelJson = await AsyncStorage.getItem("largeModel");
       const smallModelsJson = await AsyncStorage.getItem("smallModels");
+      console.log("🚀 ~ loadModelsInfo ~ smallModelsJson:", smallModelsJson);
 
       if (largeModelJson) setLargeModel(JSON.parse(largeModelJson));
       if (smallModelsJson) setSmallModels(JSON.parse(smallModelsJson));
@@ -158,11 +159,16 @@ const ModelsContextProvider = ({ children }: Props) => {
       encoding: EncodingType.Base64,
     });
 
-    const buffer = Buffer.from(base64String, "base64");
+    const binaryString = atob(base64String);
 
-    const arrayBuffer = buffer.buffer;
+    const len = binaryString.length;
+    const bytes = new Uint8Array(len);
 
-    return arrayBuffer;
+    for (let i = 0; i < len; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+
+    return bytes.buffer;
   };
 
   const load = useCallback(async (modelPath?: string) => {
@@ -180,9 +186,9 @@ const ModelsContextProvider = ({ children }: Props) => {
 
     const arrayBuffer = await readBinaryFile(modelPath + "weights.bin");
 
-    const weithsInfo = io.decodeWeights(arrayBuffer, manifest);
+    const weightsInfo = io.decodeWeights(arrayBuffer, manifest);
 
-    const weightsTensor = Object.values(weithsInfo);
+    const weightsTensor = Object.values(weightsInfo);
 
     model.setWeights(weightsTensor);
 
